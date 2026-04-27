@@ -2,20 +2,22 @@
 
 ## 현재 상태
 
-**토스 심사용 마케팅 사이트(`apps/site`) 완료.** 정상 흐름 M1~M5는 별도 트랙. Production-Lite v1.0 (~2.5주) 전략 진행 중.
+**토스 심사용 마케팅 사이트 라이브.** https://woodjean-pangyo.com (Vercel NS 위임, SSL 자동 발급). 정상 흐름 M1~M5는 별도 트랙. Production-Lite v1.0 (~2.5주) 전략 진행 중.
 
 ## 완료된 작업 (2026-04-27)
 
 ### 토스 심사용 마케팅 사이트 (`apps/site`)
 - [x] monorepo 골격 — `pnpm-workspace.yaml`, `turbo.json`, `tsconfig.base.json`, 루트 `package.json`
-- [x] `apps/site` 셋업 — Next.js 16 App Router + Tailwind 4 + Noto Sans KR + Cormorant Garamond
+- [x] `apps/site` 셋업 — Next.js 16 App Router + Tailwind 4 + Noto Sans KR (고딕 단일 폰트)
 - [x] 페이지 6개 — `/`, `/menu`, `/order`, `/about`, `/terms`, `/privacy`
 - [x] 메뉴 데이터 30종 (네이버 플레이스에서 가격까지 수집)
-- [x] 사업자 정보 푸터 박힘 — 상호/대표/사업자번호/주소
+- [x] 사업자 정보 푸터 — 카페우드진 판교테크노밸리점 / 전준현 / 730-56-01086
 - [x] 에셋 — 본사 메뉴 이미지 30장 + 매장 인테리어 12장
-- [x] dev 서버 동작 검증 (Playwright, 6 페이지 모두 200, 이미지 30/30 로드)
-- 도메인 `woodjean-pangyo.com` (가비아 구매 완료) → Vercel 배포는 사용자 작업
-- TODO: 라떼 4종 (latte/vanilla/hazelnut/caramel) 본사 이미지가 동일 파일. 토스 지적 시 교체
+- [x] 데스크톱(`max-w-7xl`) + 모바일 헤더 컴팩트로 시각 점검
+- [x] Vercel 배포 (`blakes-projects-74b330f4/woodjean`) + `vercel --prod`
+- [x] 가비아 도메인 → Vercel NS(`ns1/ns2.vercel-dns.com`) 위임
+- [x] SSL 발급 + 6페이지 200 검증 (https://woodjean-pangyo.com, https://www.woodjean-pangyo.com)
+- TODO: 라떼 4종(latte/vanilla/hazelnut/caramel) 본사 이미지 동일 파일 — 토스 지적 시 교체
 
 ## 완료된 작업 (2026-04-26)
 
@@ -38,10 +40,9 @@
 - 시작 신호 받으면 **M1 (모노레포 + Supabase + 메뉴 시드)** 부터 진행
 
 ### 사장님 작업 (Things)
+- 즉시: 토스페이먼츠 가맹 심사 재제출 (사이트 URL: https://woodjean-pangyo.com)
 - 즉시: Telegram 봇 / 메뉴 알레르기 / 통신판매업 신고
 - M4: SMS 자료 전달 (통신증명원 + 사업자등록증)
-- M4 끝: 토스페이먼츠 가맹 심사 신청
-- 선택: 자체 도메인 구매
 
 ### 사용자(blake) 작업 (Things)
 - M4: Solapi 발신번호 등록 (사장님 자료 받은 후)
