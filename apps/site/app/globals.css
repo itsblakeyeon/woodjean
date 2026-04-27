@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+@theme {
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  /* Wood + Denim palette */
+  --color-bg: #fbf8f3;
+  --color-paper: #f5efe5;
+  --color-ink: #1d1815;
+  --color-ink-soft: #4a3f37;
+  --color-ink-mute: #8a7d72;
+  --color-wood: #b08562;
+  --color-wood-deep: #7a5635;
+  --color-denim: #2a4d6e;
+  --color-denim-soft: #5a7f9e;
+  --color-line: #e6dbcb;
+  --color-accent: #c97d3c;
+}
+
+html,
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans), "Apple SD Gothic Neo", -apple-system, BlinkMacSystemFont, system-ui,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "ss01", "tnum";
+}
+
+* {
+  border-color: var(--color-line);
+}
+
+.serif {
+  font-family: var(--font-sans), "Apple SD Gothic Neo", -apple-system, BlinkMacSystemFont, system-ui,
+    sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+.divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--color-line) 20%, var(--color-line) 80%, transparent);
+}
+
+/* Subtle paper texture using CSS gradients */
+.paper-texture {
+  background-color: var(--color-paper);
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(176, 133, 98, 0.04) 0%, transparent 60%),
+    radial-gradient(circle at 80% 70%, rgba(42, 77, 110, 0.03) 0%, transparent 60%);
+}
