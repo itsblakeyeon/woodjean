@@ -41,3 +41,6 @@ coverage/
 # Misc
 .cache/
 *.local
+
+# Codex CLI session state (machine-local)
+.context/
