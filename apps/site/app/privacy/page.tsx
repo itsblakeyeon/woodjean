@@ -12,7 +12,7 @@ export default function PrivacyPage() {
     <Section className="max-w-3xl pb-24 pt-20">
       <SectionLabel>Privacy</SectionLabel>
       <h1 className="mt-3 serif text-3xl md:text-4xl">개인정보처리방침</h1>
-      <p className="mt-4 text-sm text-[var(--color-ink-mute)]">시행일: 2026년 4월 1일</p>
+      <p className="mt-4 text-sm text-[var(--color-ink-mute)]">시행일: 2026년 5월 1일 (v1.0)</p>
 
       <div className="mt-12 text-[var(--color-ink-soft)]">
         <p className="text-sm leading-loose">
@@ -24,16 +24,18 @@ export default function PrivacyPage() {
         <h2 className="serif mt-10 text-xl text-[var(--color-ink)]">1. 수집 항목 및 수집 방법</h2>
         <p className="mt-3 text-sm leading-loose">매장은 단체주문 서비스 제공을 위해 아래의 개인정보를 수집합니다.</p>
         <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-loose">
-          <li>필수: 닉네임, 휴대전화번호, 디바이스 식별자, 결제 정보(토스페이먼츠 처리)</li>
-          <li>배달 주문 시: 배달지 주소, 사무실/회의실 정보</li>
-          <li>자동 수집: 접속 일시, 접속 IP, 쿠키, 서비스 이용 기록</li>
+          <li>필수: 닉네임, 휴대전화번호</li>
+          <li>배달 정보: 배달지 건물·층·수령자·수령위치, 추가 메모</li>
+          <li>자동 수집: 접속 일시, 접속 IP, 서비스 이용 기록</li>
+          <li>v1.5(예정): 토스페이먼츠 선결제 옵션 도입 시 결제 정보 추가 수집</li>
         </ul>
 
         <h2 className="serif mt-10 text-xl text-[var(--color-ink)]">2. 수집 및 이용 목적</h2>
         <ul className="mt-3 list-disc space-y-1 pl-5 text-sm leading-loose">
-          <li>단체주문 접수, 결제 및 결제 검증</li>
-          <li>주문 상태 안내 및 SMS 알림 발송</li>
-          <li>매장 운영자 알림 및 주문 처리</li>
+          <li>단체주문 접수 및 배달 처리</li>
+          <li>주문 컨펌 SMS 발송 (배달 30분 전 자동 알림)</li>
+          <li>매장 운영자(텔레그램) 알림 및 운영 처리</li>
+          <li>노쇼 이력 관리 (블랙리스트 자동 등록)</li>
           <li>부정 이용 방지, 분쟁 처리, 법령상 의무 이행</li>
         </ul>
 
@@ -69,12 +71,12 @@ export default function PrivacyPage() {
             </thead>
             <tbody className="text-[var(--color-ink-soft)]">
               <tr className="border-b border-[var(--color-line)]">
-                <td className="px-4 py-3">토스페이먼츠</td>
-                <td className="px-4 py-3">결제 및 결제 검증, 환불 처리</td>
+                <td className="px-4 py-3">Solapi (쿠팡플레이)</td>
+                <td className="px-4 py-3">고객 컨펌 SMS 발송</td>
               </tr>
               <tr className="border-b border-[var(--color-line)]">
-                <td className="px-4 py-3">Solapi</td>
-                <td className="px-4 py-3">주문 상태 SMS 알림 발송</td>
+                <td className="px-4 py-3">Telegram (Telegram FZ-LLC)</td>
+                <td className="px-4 py-3">매장 운영자 주문 알림</td>
               </tr>
               <tr className="border-b border-[var(--color-line)]">
                 <td className="px-4 py-3">Supabase</td>
@@ -82,7 +84,7 @@ export default function PrivacyPage() {
               </tr>
               <tr>
                 <td className="px-4 py-3">Vercel</td>
-                <td className="px-4 py-3">웹사이트 호스팅</td>
+                <td className="px-4 py-3">웹·API 호스팅</td>
               </tr>
             </tbody>
           </table>

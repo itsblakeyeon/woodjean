@@ -1,0 +1,6 @@
+{
+  "crons": [
+    { "path": "/api/cron/confirm-sms", "schedule": "*/5 * * * *" },
+    { "path": "/api/cron/no-show-check", "schedule": "*/10 * * * *" }
+  ]
+}

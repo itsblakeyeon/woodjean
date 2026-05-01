@@ -4,14 +4,12 @@ export type LeadTimeRule = {
 };
 
 export const GROUP_ORDER = {
-  minQty: 10,
+  minQty: 5,
   maxQty: 30,
-  slotMinutes: 30,
-  slotCapacity: 15,
-  hourlyCapacity: 30,
+  slotMinutes: 60,
+  slotCapacity: 1,
+  hourlyCapacity: 1,
   leadTime: [
-    { range: "10잔", hours: "1시간 전 예약" },
-    { range: "11~20잔", hours: "1시간 30분 전 예약" },
-    { range: "21~30잔", hours: "2시간 전 예약" },
+    { range: "5~30잔", hours: "1시간 전 예약" },
   ] as LeadTimeRule[],
 };

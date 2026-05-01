@@ -1,7 +1,9 @@
 import Image from "next/image";
-import { type MenuItem } from "@/lib/data/menu";
+import { displayPrice, displayTemp, type MenuItem } from "@/lib/data/menu";
 
 export function MenuCard({ item }: { item: MenuItem }) {
+  const tempLabel = displayTemp(item);
+
   return (
     <div className="group">
       <div className="relative aspect-[4/5] overflow-hidden rounded-md border border-[var(--color-line)] bg-[var(--color-paper)]">
@@ -12,16 +14,16 @@ export function MenuCard({ item }: { item: MenuItem }) {
           sizes="(max-width: 768px) 50vw, 25vw"
           className="object-cover transition duration-700 group-hover:scale-105"
         />
-        {item.note && (
+        {tempLabel && (
           <div className="absolute right-2 top-2 rounded-full bg-[var(--color-ink)]/85 px-2 py-0.5 text-[10px] uppercase tracking-wider text-[var(--color-bg)]">
-            {item.note}
+            {tempLabel}
           </div>
         )}
       </div>
       <div className="mt-3 flex items-baseline justify-between gap-2">
         <div className="text-sm font-medium text-[var(--color-ink)]">{item.name}</div>
         <div className="mono text-sm tabular-nums text-[var(--color-ink-soft)]">
-          {item.price.toLocaleString()}원
+          {displayPrice(item)}
         </div>
       </div>
       {item.description && (

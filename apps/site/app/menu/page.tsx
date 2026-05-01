@@ -6,7 +6,7 @@ import { CATEGORY_LABEL, MENU_BY_CATEGORY, type MenuCategory } from "@/lib/data/
 export const metadata: Metadata = {
   title: "메뉴",
   description:
-    "우드진 판교점 전체 메뉴. 시그니처 5종, 커피 13종, 논커피 12종 — 호주식 카페에서 만나는 30종의 음료.",
+    "우드진 판교점 전체 메뉴. 시그니처 3종, 커피 13종, 논커피 11종 — 호주식 카페에서 만나는 27종의 음료.",
 };
 
 const ORDER: MenuCategory[] = ["signature", "coffee", "non-coffee"];

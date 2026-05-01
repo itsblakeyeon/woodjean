@@ -44,3 +44,4 @@ coverage/
 
 # Codex CLI session state (machine-local)
 .context/
+.gstack/

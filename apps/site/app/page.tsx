@@ -79,7 +79,7 @@ export default function HomePage() {
         <div className="flex items-end justify-between gap-4">
           <div>
             <SectionLabel>Signature</SectionLabel>
-            <h2 className="mt-3 serif text-3xl md:text-4xl">시그니처 5종</h2>
+            <h2 className="mt-3 serif text-3xl md:text-4xl">시그니처 3종</h2>
           </div>
           <Link
             href="/menu"
@@ -88,7 +88,7 @@ export default function HomePage() {
             전체 메뉴 →
           </Link>
         </div>
-        <div className="mt-10 grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-5 md:gap-x-8">
+        <div className="mt-10 grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-3 md:gap-x-8">
           {signatures.map((m) => (
             <MenuCard key={m.slug} item={m} />
           ))}
@@ -103,11 +103,12 @@ export default function HomePage() {
               <SectionLabel>Group Order</SectionLabel>
               <h2 className="mt-3 serif text-3xl leading-snug md:text-4xl">
                 회의에 어울리는<br />
-                10잔부터 30잔까지
+                5잔부터 30잔까지
               </h2>
               <p className="mt-6 text-base leading-loose text-[var(--color-ink-soft)]">
                 판교 테크노밸리 사무실로 미리 예약 배달해 드립니다.
-                시간 슬롯제로 진행되며, 한 번에 30잔까지 주문할 수 있습니다.
+                1시간 단위 슬롯, 1시간 전 예약. 결제는 사람과 사람으로
+                — 배달 시 현장에서 카드·송금·이체로 받습니다.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
@@ -142,11 +143,11 @@ export default function HomePage() {
               <div className="mt-6 grid gap-3 text-sm text-[var(--color-ink-soft)] sm:grid-cols-2">
                 <div className="flex items-baseline gap-3">
                   <span className="text-[var(--color-ink-mute)]">슬롯</span>
-                  <span>30분 단위 · 시간당 최대 {GROUP_ORDER.hourlyCapacity}잔</span>
+                  <span>1시간 단위 · 시간당 1건</span>
                 </div>
                 <div className="flex items-baseline gap-3">
                   <span className="text-[var(--color-ink-mute)]">결제</span>
-                  <span>토스페이먼츠 카드결제</span>
+                  <span>현장 후불 (카드 / 송금 / 이체)</span>
                 </div>
               </div>
             </div>
