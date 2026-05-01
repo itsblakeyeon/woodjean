@@ -20,7 +20,7 @@ const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
 export type Slot = {
   /** ISO datetime UTC (DB delivery_at에 저장될 값) */
   deliveryAt: string;
-  /** 사람 표시용 KST "16:00~16:15" */
+  /** 사람 표시용 KST "16:00~17:00" (1시간 슬롯) */
   displayWindow: string;
   available: boolean;
   reason?: "past_lead" | "outside_hours" | "paused" | "slot_taken";
@@ -84,7 +84,7 @@ function utcToKstParts(d: Date): { year: number; month: number; day: number; hou
 
 function formatKstWindow(d: Date): string {
   const k = utcToKstParts(d);
-  const k2 = utcToKstParts(new Date(d.getTime() + 15 * 60_000));
+  const k2 = utcToKstParts(new Date(d.getTime() + SLOT_MS));
   const pad = (n: number) => String(n).padStart(2, "0");
   return `${pad(k.hour)}:${pad(k.minute)}~${pad(k2.hour)}:${pad(k2.minute)}`;
 }

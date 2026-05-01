@@ -12,19 +12,10 @@
     "build": "node build.mjs",
     "dev": "node --import tsx src/index.ts",
     "typecheck": "tsc --noEmit",
-    "prepublishOnly": "pnpm build"
+    "prepublishOnly": "node build.mjs"
   },
-  "dependencies": {
-    "@clack/prompts": "^0.9.0",
-    "@woodjean/shared": "workspace:*",
-    "commander": "^12.1.0",
-    "figlet": "^1.8.0",
-    "gradient-string": "^3.0.0",
-    "kleur": "^4.1.5",
-    "qrcode-terminal": "^0.12.0",
-    "string-width": "^7.2.0",
-    "zod": "^3.24.1"
-  },
+  "devDependencies_runtime_bundled": "all runtime deps below are bundled into dist/cli.mjs by esbuild — listed under devDependencies so npm install does not re-fetch them at install time",
+  "dependencies": {},
   "devDependencies": {
     "@types/figlet": "^1.7.0",
     "@types/node": "^22.10.2",
