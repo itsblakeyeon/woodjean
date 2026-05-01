@@ -2,13 +2,26 @@
 
 ## 현재 상태
 
-**v1.0 골격 + 3중 리뷰(보안/Codex/디자인) + fix 모두 완료 (2026-05-01).** 외부 의존성(Supabase / Telegram / Solapi / Vercel) 셋업과 deploy만 남음.
+**v1.0 골격 + 3중 리뷰(보안/Codex/디자인) + fix 모두 완료, Supabase/Telegram/Solapi/Vercel 배포 및 핵심 E2E 통과 (2026-05-01).** 운영 대표번호 SMS 전환, CLI publish/E2E, Linear 정리만 남음.
 
 ### 리뷰 + fix 적용 (2026-05-01)
 - **/gstack-cso (보안)**: 4 finding → 모두 fix. fail-open 패턴 invert + production env validator + phone rate limit
 - **/gstack-codex (challenge)**: 12 finding 중 critical/high 7개 + medium 5개 모두 fix. KST↔UTC 변환, server-side slot validation, race-safe UPDATE RETURNING, HTML escape, immutable index, atomic SMS claim, PII reduction, webhook idempotency rollback
 - **/gstack-design-review (시각)**: 1 finding 발견 + fix. 모바일 메뉴 카드 이름 줄바꿈 stack 처리. Design A-, AI Slop A
 - **빌드 검증**: site/bot/cli 모두 통과. CLI 콜드 스타트 58ms.
+
+### 배포 + 운영 셋업 (2026-05-01)
+- [x] Supabase `woodjean` 프로젝트 생성 (서울 ap-northeast-2, ref `vcqttmokmajbwfzxuyvb`)
+- [x] Supabase migrations + menu seed 적용. `menu=27`, `menu_extras=4`, `settings=7`
+- [x] Supabase advisor 재검사: `No issues found`
+- [x] Vercel 프로젝트 분리: `woodjean-web`(사이트), `woodjean-bot`(API/Telegram/Cron)
+- [x] `woodjean-bot` 배포: https://bot.woodjean-pangyo.com
+- [x] Telegram bot token + owner chat id + webhook secret 등록, webhook 연결 완료
+- [x] Solapi API key/secret 등록. 테스트 발신번호 `01090659412`로 SMS 발송 확인
+- [x] 주문 E2E: 주문 생성 → Telegram 알림 → SMS 수신 → Telegram 취소 버튼 → 취소 SMS 수신 확인
+- [x] 테스트 주문 `ord_sthP9bCNTzEp9jgr` DB 삭제 완료
+- [x] `woodjean-web` 재배포: https://woodjean-pangyo.com
+- [x] 사이트 메타/본문 검증: `5잔부터 30잔`, `npx woodjean order`, 대표번호 `010-8484-2120`
 
 ## 완료된 작업 (2026-05-01 — 골격)
 
@@ -104,37 +117,41 @@
 
 ## 다음 단계
 
-### 외부 의존성 셋업 (사용자 작업)
-- [ ] **Supabase 프로젝트** (서울 ap-northeast-2): URL + service_role key, `supabase db push` + `psql ... < seed/menu.sql`
-- [ ] **Telegram 봇**: @BotFather에서 봇 생성, owner chat_id 확인, webhook secret 생성
-- [ ] **Solapi SMS**: API key + 발신번호 등록 (사장님 통신증명서 + 사업자등록증 필요)
-- [ ] **Vercel `woodjean-bot` 프로젝트** 신규 생성 + env 등록 + 배포
-- [ ] **Telegram setWebhook** API 호출 (배포 후)
-- [ ] CLI npm publish (외부 셋업 완료 후)
+### 운영 전 남은 작업
+- [ ] **Solapi 운영 대표번호 전환**: `01084842120` 발신번호 승인 후 Vercel `woodjean-bot` production env `SOLAPI_FROM_NUMBER`를 `01084842120`으로 교체
+- [ ] **CLI npm publish**: `cd apps/cli && npm publish`
+- [ ] **Linear PER-32 정리**: Linear MCP 재인증 후 M2 결제+어드민 아카이브, PER-17~24 신규 Telegram/SMS 흐름으로 재맵핑
 
-### QA / 검증 (외부 셋업 후)
+### QA / 검증
+- [x] 사이트 production deploy + `/order` 핵심 문구 확인
+- [x] Bot production deploy + `/api/slots` 확인
+- [x] Telegram webhook 연결 확인
+- [x] 주문 생성 + Telegram 알림 + SMS 확인
+- [x] Telegram 취소 버튼 + 취소 SMS 확인
 - [ ] CLI end-to-end 흐름 (5잔 / 20잔 / 30잔 / 우디슈페너 variant / 페퍼민트 L only / 피콜로 HOT only)
 - [ ] 슬롯 cap 동시성 (같은 시간에 2개 주문 → 1개 거부)
-- [ ] Telegram 인라인 버튼 [완료/취소/노쇼] 동작
+- [x] Telegram 인라인 버튼 [취소] 동작
+- [ ] Telegram 인라인 버튼 [완료/노쇼] 동작
 - [ ] /중지 오늘 / /재개 명령
 - [ ] 30분 전 SMS 발송 (Cron)
 - [ ] 노쇼 자동 블랙리스트
 - [ ] 첫주문/20잔↑ 콜 권장 표시
-- [ ] 사이트 시각 점검 (모바일 + 데스크탑)
+- [ ] 사이트 시각 점검 (모바일 + 데스크탑, 재배포 후)
 - [ ] CLI 시각 점검 (스플래시 + 흐름)
 
 ### Linear PER-32 정리
+- Linear MCP 현재 401 인증 오류. 재인증 후 진행.
 - M2 (결제+어드민) 아카이브
 - 기존 PER-17~24 → 신규 흐름으로 재맵핑
 
 ### 사장님 작업 (Things)
-- 즉시: Telegram 봇 / 메뉴 알레르기 / 통신판매업 신고
+- 즉시: 메뉴 알레르기 / 통신판매업 신고
 - 추후 (v1.5): 토스페이먼츠 가맹 심사 (선결제 옵션 — v1.0 무관)
 - M4: SMS 자료 전달 (통신증명원 + 사업자등록증)
 
 ### 사용자(blake) 작업 (Things)
-- M4: Solapi 발신번호 등록 (사장님 자료 받은 후)
-- M5: 약관 + 개인정보처리방침 작성
+- M4: Solapi 운영 대표번호 등록 (사장님 자료 받은 후). 테스트 번호 `01090659412`는 완료
+- M5: 약관 + 개인정보처리방침 작성 완료
 
 ## 마일스톤 (Linear — PER-32 갱신 예정)
 

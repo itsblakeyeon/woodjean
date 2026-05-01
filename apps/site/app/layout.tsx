@@ -22,13 +22,13 @@ export const metadata: Metadata = {
     template: "%s | WOODJEAN 판교점",
   },
   description:
-    "판교 테크노밸리 호주식 카페 우드진. 회의용 단체주문 10잔부터 30잔까지 사전 예약 배달.",
+    "판교 테크노밸리 호주식 카페 우드진. 회의용 단체주문 5잔부터 30잔까지 사전 예약 배달.",
   metadataBase: new URL("https://woodjean-pangyo.com"),
   openGraph: {
     type: "website",
     locale: "ko_KR",
     title: "WOODJEAN 판교점",
-    description: "판교 테크노밸리 호주식 카페 우드진. 단체주문 10잔부터 30잔까지.",
+    description: "판교 테크노밸리 호주식 카페 우드진. 단체주문 5잔부터 30잔까지.",
     siteName: "WOODJEAN 판교점",
   },
 };

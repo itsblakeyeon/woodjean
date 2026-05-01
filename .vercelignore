@@ -1,0 +1,17 @@
+.git
+.vercel
+.secrets
+.env
+.env.*
+node_modules
+**/node_modules
+.next
+**/.next
+.turbo
+**/.turbo
+dist
+**/dist
+.gstack
+.context
+.playwright-mcp
+*.log

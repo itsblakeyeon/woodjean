@@ -7,6 +7,18 @@
 
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
+-- Slot bucket helper.
+-- Postgres treats timestamptz epoch extraction as non-immutable because it can
+-- depend on timezone context. We pin the conversion to UTC and expose a stable
+-- immutable helper so the generated column can back the unique slot index.
+CREATE OR REPLACE FUNCTION delivery_hour_bucket(ts TIMESTAMPTZ)
+RETURNS BIGINT
+LANGUAGE sql
+IMMUTABLE
+AS $$
+  SELECT FLOOR(EXTRACT(EPOCH FROM (ts AT TIME ZONE 'UTC')) / 3600)::BIGINT;
+$$;
+
 -- ============================================================================
 -- menu — 음료 마스터 (가격표 기반)
 -- ============================================================================
@@ -79,7 +91,7 @@ CREATE TABLE orders (
   -- SMS 멱등 claim (Codex #7) — cron이 atomic update로 단 1회만 발송
   sms_reminder_sent_at TIMESTAMPTZ,
   -- 슬롯 cap을 위한 epoch-hour bucket (Codex #3 — date_trunc IMMUTABLE 회피)
-  delivery_hour BIGINT GENERATED ALWAYS AS ((EXTRACT(EPOCH FROM delivery_at) / 3600)::BIGINT) STORED,
+  delivery_hour BIGINT GENERATED ALWAYS AS (delivery_hour_bucket(delivery_at)) STORED,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

@@ -13,6 +13,7 @@ build/
 .env
 .env.local
 .env.*.local
+.secrets/
 
 # Vercel
 .vercel/
@@ -45,3 +46,4 @@ coverage/
 # Codex CLI session state (machine-local)
 .context/
 .gstack/
+.vercel

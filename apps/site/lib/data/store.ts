@@ -6,7 +6,7 @@ export const STORE = {
   bizNumber: "730-56-01086",
   address: "경기도 성남시 분당구 대왕판교로 660, 224호 (삼평동, 유스페이스1)",
   addressShort: "경기 성남시 분당구 대왕판교로 660 224호",
-  phone: "0507-0289-3445",
+  phone: "010-8484-2120",
   email: "cafewoodjean@naver.com",
   hours: [
     { label: "평일 (월~금)", value: "07:00 – 17:00" },
