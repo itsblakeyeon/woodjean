@@ -20,8 +20,8 @@ export function MenuCard({ item }: { item: MenuItem }) {
           </div>
         )}
       </div>
-      <div className="mt-3 flex items-baseline justify-between gap-2">
-        <div className="text-sm font-medium text-[var(--color-ink)]">{item.name}</div>
+      <div className="mt-3 flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-2">
+        <div className="text-sm font-medium text-[var(--color-ink)] break-keep">{item.name}</div>
         <div className="mono text-sm tabular-nums text-[var(--color-ink-soft)]">
           {displayPrice(item)}
         </div>
