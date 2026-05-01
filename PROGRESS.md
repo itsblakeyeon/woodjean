@@ -2,7 +2,13 @@
 
 ## 현재 상태
 
-**v1.0 골격 코드 전부 작성 완료 (2026-05-01).** 외부 의존성(Supabase / Telegram / Solapi / Vercel) 셋업만 남음. 빌드 3개(site/bot/cli) 모두 통과, CLI 콜드 스타트 58ms. 다음 단계는 외부 셋업 + QA.
+**v1.0 골격 + 3중 리뷰(보안/Codex/디자인) + fix 모두 완료 (2026-05-01).** 외부 의존성(Supabase / Telegram / Solapi / Vercel) 셋업과 deploy만 남음.
+
+### 리뷰 + fix 적용 (2026-05-01)
+- **/gstack-cso (보안)**: 4 finding → 모두 fix. fail-open 패턴 invert + production env validator + phone rate limit
+- **/gstack-codex (challenge)**: 12 finding 중 critical/high 7개 + medium 5개 모두 fix. KST↔UTC 변환, server-side slot validation, race-safe UPDATE RETURNING, HTML escape, immutable index, atomic SMS claim, PII reduction, webhook idempotency rollback
+- **/gstack-design-review (시각)**: 1 finding 발견 + fix. 모바일 메뉴 카드 이름 줄바꿈 stack 처리. Design A-, AI Slop A
+- **빌드 검증**: site/bot/cli 모두 통과. CLI 콜드 스타트 58ms.
 
 ## 완료된 작업 (2026-05-01 — 골격)
 

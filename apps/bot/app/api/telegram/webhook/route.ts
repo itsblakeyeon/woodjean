@@ -51,7 +51,9 @@ export async function POST(req: Request) {
   const update = parsed.data;
   const eventKey = `telegram:${update.update_id}`;
 
-  // Idempotency
+  // Idempotency claim — INSERT 먼저, 처리 실패 시 row 삭제로 rollback (Codex #8 fix).
+  // 동시 호출 시 두 번째는 unique 위반으로 dedup, 첫 번째가 처리 도중 fail하면
+  // row를 삭제해 Telegram retry가 재처리할 수 있게 함.
   const { error: insErr } = await supabase().from("webhook_events").insert({
     event_key: eventKey,
     provider: "telegram",
@@ -60,8 +62,13 @@ export async function POST(req: Request) {
   if (insErr && insErr.code === "23505") {
     return NextResponse.json({ ok: true, deduped: true });
   }
+  if (insErr) {
+    console.error("[telegram] webhook_events insert failed", insErr);
+    return NextResponse.json({ ok: false, error: "internal" }, { status: 500 });
+  }
 
   // 사장님(owner) 외 무시 — defense in depth (secret 검증 + chat_id 검증)
+  // owner 검증 실패는 "처리 완료 (무시)"로 보고 dedup row 유지 (재처리 의미 없음).
   if (!env.TELEGRAM_OWNER_CHAT_ID) {
     console.error("[telegram] TELEGRAM_OWNER_CHAT_ID not configured — rejecting");
     return NextResponse.json({ ok: false, error: "misconfigured" }, { status: 500 });
@@ -78,7 +85,15 @@ export async function POST(req: Request) {
       await handleCommand(update.message.text);
     }
   } catch (e) {
-    console.error("[telegram webhook]", e);
+    console.error("[telegram webhook] processing failed, rolling back dedup", e);
+    // Rollback: row 삭제로 retry 가능하게
+    try {
+      await supabase().from("webhook_events").delete().eq("event_key", eventKey);
+    } catch (rbErr) {
+      console.error("[telegram webhook] rollback delete failed", rbErr);
+    }
+    // 500을 반환해 Telegram이 재시도하도록 (성공시 200 반환되어 dedup 유효)
+    return NextResponse.json({ ok: false, error: "processing_failed" }, { status: 500 });
   }
 
   return NextResponse.json({ ok: true });
