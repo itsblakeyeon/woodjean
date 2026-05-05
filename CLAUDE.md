@@ -7,8 +7,6 @@
 - **타깃**: 판교 개발자 대상 단체주문 (회의용 음료 5~30잔)
 - **콘셉트**: CLI 자체가 트위터/HN/디스코드에서 회자될 마케팅 자산
 - **출시 전략**: Production-Lite v1.0 (~2.5주)
-- **상세 plan**: `~/.claude/plans/crispy-moseying-horizon.md`
-- **현재 진행**: `PROGRESS.md`
 
 ## 기술 스택
 
@@ -26,7 +24,7 @@
 
 > **v1.0에서 빠진 것 (4/29 Ultra-Lean 결정)**: 토스페이먼츠 SDK + `apps/pay` 결제 페이지 + `apps/admin` 어드민 대시보드 (운영은 텔레그램 봇으로 대체)
 
-## 디렉토리 구조 (예정)
+## 디렉토리 구조
 
 ```
 apps/
@@ -68,7 +66,6 @@ supabase/
 - **개발 (코드)**: Linear "Woodjean v1.0" 프로젝트 — M1~M5 마일스톤
   - https://linear.app/internal-org/project/woodjean-v10-bf152503a3c5
 - **개발 외 (사장님 + blake)**: Things 3 "Woodjean" 프로젝트
-- **Plan**: `~/.claude/plans/crispy-moseying-horizon.md`
 
 ## 코딩 컨벤션
 
@@ -102,7 +99,5 @@ supabase/
 ## 작업 시작 시 참고
 
 새 세션에서 이 프로젝트 코드 작업할 때:
-1. `PROGRESS.md` 읽고 현재 상태 확인
-2. `~/.claude/plans/crispy-moseying-horizon.md` 읽고 plan 확인
-3. Linear에서 다음 마일스톤 티켓 확인 (M1: PER-17부터)
-4. 외부 의존성 (Supabase, Vercel, 토스 테스트 키 등) 셋업 상태 확인
+1. Linear에서 다음 마일스톤 티켓 확인
+2. 외부 의존성 (Supabase, Vercel 등) 셋업 상태 확인
