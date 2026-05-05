@@ -1,5 +1,8 @@
 import figlet from "figlet";
+import ansiShadowFont from "figlet/fonts/ANSI Shadow";
 import gradient from "gradient-string";
+
+figlet.parseFont("ANSI Shadow", ansiShadowFont);
 
 const ETHOS = "WOOD JEAN IN THE GREY BUILDINGS";
 

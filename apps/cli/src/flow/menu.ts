@@ -149,7 +149,7 @@ async function pickOneItem(): Promise<CartItem | null> {
 
   let chosenOpts: { shot: boolean; milkChange: boolean; decaf: boolean } = { shot: false, milkChange: false, decaf: false };
   if (optionList.length > 0) {
-    const picks = await p.multiselect<("shot" | "milkChange" | "decaf")[]>({
+    const picks = await p.multiselect<"shot" | "milkChange" | "decaf">({
       message: "옵션 (없으면 Enter)",
       options: optionList.map((o) => ({ value: o.key, label: o.label })),
       required: false,
