@@ -34,8 +34,12 @@ export default function MenuPage() {
               </span>
             </div>
             <div className="grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-4 md:gap-x-8 lg:grid-cols-5">
-              {items.map((m) => (
-                <MenuCard key={m.slug} item={m} />
+              {items.map((m, index) => (
+                <MenuCard
+                  key={m.slug}
+                  item={m}
+                  eager={cat === "signature" || (cat === "coffee" && index < 5)}
+                />
               ))}
             </div>
           </Section>

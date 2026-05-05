@@ -32,13 +32,11 @@ export default function AboutPage() {
           </div>
           <div className="md:col-span-7">
             <div className="relative aspect-[4/3] overflow-hidden rounded-md border border-[var(--color-line)]">
-              <Image
-                src="/interior/11.jpg"
-                alt="WOODJEAN 판교점 인테리어"
-                fill
-                priority
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 60vw"
+              <div
+                role="img"
+                aria-label="WOODJEAN 판교점 인테리어"
+                className="h-full w-full bg-cover bg-center"
+                style={{ backgroundImage: "url('/interior/11.jpg')" }}
               />
             </div>
           </div>

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { displayPrice, displayTemp, type MenuItem } from "@/lib/data/menu";
 
-export function MenuCard({ item }: { item: MenuItem }) {
+export function MenuCard({ item, eager = false }: { item: MenuItem; eager?: boolean }) {
   const tempLabel = displayTemp(item);
 
   return (
@@ -12,6 +12,7 @@ export function MenuCard({ item }: { item: MenuItem }) {
           alt={item.name}
           fill
           sizes="(max-width: 768px) 50vw, 25vw"
+          preload={eager}
           className="object-cover transition duration-700 group-hover:scale-105"
         />
         {tempLabel && (

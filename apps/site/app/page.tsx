@@ -14,13 +14,11 @@ export default function HomePage() {
       {/* Hero */}
       <section className="relative isolate overflow-hidden">
         <div className="absolute inset-0 -z-10">
-          <Image
-            src="/interior/8.jpg"
-            alt="WOODJEAN 판교점 매장 인테리어"
-            fill
-            priority
-            className="object-cover"
-            sizes="100vw"
+          <div
+            role="img"
+            aria-label="WOODJEAN 판교점 매장 인테리어"
+            className="h-full w-full bg-cover bg-center"
+            style={{ backgroundImage: "url('/interior/8.jpg')" }}
           />
           <div className="absolute inset-0 bg-gradient-to-b from-[var(--color-ink)]/55 via-[var(--color-ink)]/25 to-[var(--color-ink)]/65" />
         </div>
