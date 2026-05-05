@@ -7,13 +7,14 @@ import { collectDelivery } from "./flow/delivery";
 import { collectCustomer } from "./flow/customer";
 import { collectConsent } from "./flow/consent";
 import { confirmAndSubmit } from "./flow/confirm";
+import packageJson from "../package.json";
 
 const program = new Command();
 
 program
   .name("woodjean")
   .description("우드진 판교점 단체주문 CLI — 회의용 음료 5~30잔 예약 배달")
-  .version("1.0.0");
+  .version(packageJson.version);
 
 program
   .command("order", { isDefault: true })

@@ -4,7 +4,7 @@ export function formatKstWindow(iso: string): string {
   const day = d.getDate();
   const hh = String(d.getHours()).padStart(2, "0");
   const mm = String(d.getMinutes()).padStart(2, "0");
-  const endD = new Date(d.getTime() + 15 * 60_000);
+  const endD = new Date(d.getTime() + 60 * 60_000);
   const eh = String(endD.getHours()).padStart(2, "0");
   const em = String(endD.getMinutes()).padStart(2, "0");
   const dayOfWeek = ["일", "월", "화", "수", "목", "금", "토"][d.getDay()];
