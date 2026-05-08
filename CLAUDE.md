@@ -63,9 +63,11 @@ supabase/
 
 ## 작업 추적
 
-- **개발 (코드)**: Linear "Woodjean v1.0" 프로젝트 — M1~M5 마일스톤
-  - https://linear.app/internal-org/project/woodjean-v10-bf152503a3c5
+- **개발 (코드)**: Linear "Woodjean v1.1 — 단골 retention 릴리스" 프로젝트 — M1 (v1.0.2 Hotfix) / M2 (v1.1 W1: L1 + Foundation) / M3 (v1.1 W2-3: L2 Paste)
+  - https://linear.app/internal-org/project/woodjean-v11-단골-retention-릴리스-a9b02cc562f0
+  - SSOT: `docs/cli-userflow-retro.md` (autoplan 4축 dual-voice 분석 결과)
 - **개발 외 (사장님 + blake)**: Things 3 "Woodjean" 프로젝트
+  - 별도 트랙: PIPA 동의 분리 법적 검토 / attribution doc / 채널 전략 doc / 사장님 retro
 
 ## 코딩 컨벤션
 
