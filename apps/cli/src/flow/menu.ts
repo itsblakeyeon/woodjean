@@ -58,9 +58,9 @@ export async function buildCart(): Promise<CartItem[] | null> {
       p.log.warn("최대 30잔까지 주문 가능해요.");
       continue;
     }
-    const item = await pickOneItem();
-    if (!item) continue;
-    cart.push(item);
+    const items = await pickItems(30 - cart.length);
+    if (!items) continue;
+    cart.push(...items);
   }
 }
 
@@ -80,7 +80,7 @@ async function reviewCart(cart: CartItem[]): Promise<number | null> {
   return idx;
 }
 
-async function pickOneItem(): Promise<CartItem | null> {
+async function pickItems(maxQuantity: number): Promise<CartItem[] | null> {
   // 1. 카테고리
   const category = await p.select<MenuCategory>({
     message: "카테고리",
@@ -169,8 +169,10 @@ async function pickOneItem(): Promise<CartItem | null> {
   // 가격 계산
   const priced = priceItem({ menuSlug: menu.slug, size, temp, variant, options: chosenOpts });
   const displayName = `${menu.name} ${size}${temp === "ICE" ? "·아이스" : "·핫"}${variant ? `·${variant}` : ""}${formatOptions(chosenOpts)}`;
+  const quantity = await pickQuantity(menu.name, maxQuantity);
+  if (quantity == null) return null;
 
-  return {
+  const item = {
     menuSlug: menu.slug,
     size,
     temp,
@@ -179,6 +181,40 @@ async function pickOneItem(): Promise<CartItem | null> {
     displayName,
     subtotal: priced.subtotal,
   };
+  p.log.success(
+    quantity === 1
+      ? `👍 ${displayName} 추가됐어요.`
+      : `👍 ${displayName} × ${quantity}잔 추가됐어요.`,
+  );
+  return Array.from({ length: quantity }, () => ({ ...item }));
+}
+
+async function pickQuantity(menuName: string, maxQuantity: number): Promise<number | null> {
+  const choices: Array<{ value: string; label: string }> = [
+    { value: "1", label: "1잔만" },
+    ...(maxQuantity >= 3 ? [{ value: "3", label: "3잔" }] : []),
+    ...(maxQuantity >= 5 ? [{ value: "5", label: "5잔" }] : []),
+    { value: "custom", label: "다른 개수 입력" },
+  ];
+  const choice = await p.select<string>({
+    message: `👍 ${menuName} 추가됨. 몇 잔으로 할까요?`,
+    options: choices,
+  });
+  if (p.isCancel(choice)) return null;
+  if (choice !== "custom") return Number(choice);
+
+  const custom = await p.text({
+    message: "몇 잔으로 할까요?",
+    placeholder: "예: 2",
+    validate: (v) => {
+      const n = Number(v);
+      if (!Number.isInteger(n) || n < 1) return "1~30 사이의 정수로 입력해 주세요.";
+      if (n > maxQuantity) return `최대 ${maxQuantity}잔까지 더 추가할 수 있어요.`;
+      return undefined;
+    },
+  });
+  if (p.isCancel(custom)) return null;
+  return Number(custom);
 }
 
 export function formatMenuPrice(m: MenuItem): string {
