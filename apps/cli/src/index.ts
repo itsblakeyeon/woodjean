@@ -14,6 +14,7 @@ import {
   loadDraft,
   type SubmitStatus,
 } from "./flow/confirm";
+import { ensureDeviceId, getTier, loadState } from "./lib/state";
 import type { OrderDraft, Step } from "./flow/draft";
 import packageJson from "../package.json";
 
@@ -118,6 +119,17 @@ program
     warnForPinnedPlaceholders(options);
 
     try {
+      try {
+        await ensureDeviceId();
+      } catch (e) {
+        p.log.warn(`디바이스 ID 저장 실패: ${e instanceof Error ? e.message : String(e)}`);
+      }
+      const state = await loadState();
+      const previousLastOrder =
+        !options.new && state?.lastOrder && getTier(state.lastOrder.savedAt) !== "expired"
+          ? state.lastOrder
+          : undefined;
+
       const persisted = await loadDraft();
       if (persisted) {
         const restore = await p.confirm({
@@ -143,7 +155,7 @@ program
         }
       }
 
-      let draft: OrderDraft = {};
+      let draft: OrderDraft = previousLastOrder ? { previousLastOrder } : {};
       for (const step of ORDER_STEPS) {
         const result = await step(draft);
         if (!result.ok) return cancelOrder(result.reason ?? "주문이 취소됐어요.");
@@ -163,7 +175,6 @@ program
 
 function warnForPinnedPlaceholders(options: OrderOptions): void {
   if (options.yes) p.log.warn("--yes는 L1 repeat 구현 후 자동 재제출로 연결돼요. 지금은 수동 확인으로 진행해요.");
-  if (options.new) p.log.warn("--new는 L1 router 구현 후 저장 정보 우회로 연결돼요. 지금은 새 주문 플로우로 진행해요.");
   if (options.paste || options.clipboard) p.log.warn("--paste는 L2 paste 구현 후 자동 인식으로 연결돼요. 지금은 직접 선택으로 진행해요.");
   if (options.json) p.log.warn("--json은 영수증 출력 구현 후 machine-readable 출력으로 연결돼요. 지금은 기본 출력으로 진행해요.");
 }

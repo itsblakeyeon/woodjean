@@ -7,6 +7,7 @@ import stringWidth from "string-width";
 import { priceItem } from "@woodjean/shared/pricing";
 import { createOrder, type CreateOrderPayload } from "../lib/api";
 import { formatKstWindow, formatPhoneRedacted, formatPrice } from "../lib/format";
+import { saveLastOrder } from "../lib/state";
 import type { CartItem } from "./menu";
 import type { DeliveryAddress } from "./delivery";
 import type { Customer } from "./customer";
@@ -203,6 +204,19 @@ export async function confirmAndSubmitPayload(payload: CreateOrderPayload, resto
       await clearDraft();
     } catch {
       // 성공한 주문의 stale draft 정리는 best-effort.
+    }
+    try {
+      await saveLastOrder({
+        savedAt: new Date().toISOString(),
+        deliveryAtISO: result.deliveryAt,
+        nickname: payload.nickname,
+        phone: payload.phone,
+        delivery: payload.deliveryAddress,
+        cart,
+        orderId: result.orderId,
+      });
+    } catch (e) {
+      p.log.warn(`최근 주문 저장 실패: ${e instanceof Error ? e.message : String(e)}`);
     }
 
     // 영수증

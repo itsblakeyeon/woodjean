@@ -1,4 +1,5 @@
 import type { Slot } from "../lib/api";
+import type { LastOrder } from "../lib/state";
 import type { Customer } from "./customer";
 import type { DeliveryAddress } from "./delivery";
 import type { CartItem } from "./menu";
@@ -9,6 +10,7 @@ export type OrderDraft = Partial<{
   delivery: DeliveryAddress;
   customer: Customer;
   agreed: boolean;
+  previousLastOrder: LastOrder;
 }>;
 
 export type StepResult =
