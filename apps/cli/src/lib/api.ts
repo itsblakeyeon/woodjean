@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { getDeviceIdHash } from "./telemetry";
 
 const API_BASE = process.env.WOODJEAN_API_URL ?? "https://bot.woodjean-pangyo.com";
 
@@ -72,10 +73,11 @@ const NotifySlotResultSchema = z.object({
 export async function registerNotify(
   phone: string,
 ): Promise<{ ok: true; expiresAt: string } | { ok: false; error: string }> {
+  const deviceIdHash = await getDeviceIdHash();
   const res = await fetch(`${API_BASE}/api/notify-slot`, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ phone }),
+    body: JSON.stringify({ phone, deviceIdHash }),
   });
   let json: z.infer<typeof NotifySlotResultSchema>;
   try {

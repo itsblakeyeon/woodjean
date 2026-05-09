@@ -18,6 +18,7 @@ export async function POST(req: Request) {
   } catch {
     return NextResponse.json({ ok: false, error: "invalid_json" }, { status: 400 });
   }
+
   const parsed = BodySchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ ok: false, error: "validation" }, { status: 400 });
@@ -30,7 +31,7 @@ export async function POST(req: Request) {
 
   try {
     const { expiresAt } = await insertNotifyTarget(parsed.data.phone, parsed.data.deviceIdHash);
-    return NextResponse.json({ ok: true, expiresAt });
+    return NextResponse.json({ ok: true, expiresAt }, { status: 201 });
   } catch (e) {
     console.error("[notify-slot POST]", e);
     return NextResponse.json({ ok: false, error: "internal" }, { status: 500 });

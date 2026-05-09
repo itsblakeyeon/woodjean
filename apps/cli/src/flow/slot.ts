@@ -16,7 +16,7 @@ export async function pickSlot(): Promise<Slot | null> {
   s.start("주문 가능한 시간 조회 중");
   let slots: Slot[];
   try {
-    slots = await listSlots();
+    slots = await listSlots(3);
   } catch (e) {
     s.stop("시간 조회 실패");
     p.log.error(e instanceof Error ? e.message : String(e));
@@ -28,7 +28,6 @@ export async function pickSlot(): Promise<Slot | null> {
     return offerNotifyAndExit();
   }
 
-  // 일자별 그룹핑
   const byDay = new Map<string, Slot[]>();
   for (const s of slots) {
     const day = s.deliveryAt.slice(0, 10);
@@ -67,14 +66,14 @@ export async function pickSlot(): Promise<Slot | null> {
 }
 
 async function offerNotifyAndExit(): Promise<Slot | null> {
-  p.log.warn("향후 7일 동안 가능한 슬롯이 모두 마감됐어요.");
+  p.log.warn("향후 3일 슬롯이 모두 마감됐어요.");
 
   const action = await p.select<"notify" | "store" | "cancel">({
     message: "다음 가능 시간이 열리면 어떻게 할까요?",
     options: [
-      { value: "notify", label: "📲 SMS로 알림 받기" },
-      { value: "store", label: "📞 매장(010-8484-2120)에 직접 문의" },
-      { value: "cancel", label: "❌ 그만두기" },
+      { value: "notify", label: "SMS로 알림 받기" },
+      { value: "store", label: "매장(010-8484-2120)에 직접 문의" },
+      { value: "cancel", label: "그만두기" },
     ],
   });
   if (p.isCancel(action) || action !== "notify") return null;
@@ -84,23 +83,22 @@ async function offerNotifyAndExit(): Promise<Slot | null> {
     placeholder: "01012345678",
     validate: (v) => {
       const digits = v.replace(/\D/g, "");
-      if (digits.length < 10 || digits.length > 11) return "10~11자리 휴대폰 번호로 입력해 주세요.";
-      if (!digits.startsWith("01")) return "01로 시작하는 번호로 입력해 주세요.";
+      if (!/^01\d{8,9}$/.test(digits)) return "010 또는 011로 시작하는 10~11자리 번호를 입력해 주세요.";
       return undefined;
     },
   });
   if (p.isCancel(phone)) return null;
 
-  const s = p.spinner();
-  s.start("알림 등록 중");
+  const spinner = p.spinner();
+  spinner.start("알림 등록 중");
   const result = await registerNotify(phone.replace(/\D/g, ""));
   if (!result.ok) {
-    s.stop("알림 등록 실패");
+    spinner.stop("알림 등록 실패");
     p.log.error(`등록에 실패했어요 (${result.error}). 매장으로 직접 문의 부탁드려요.`);
     return null;
   }
-  s.stop("알림 등록됐어요 (7일간 유효)");
-  p.log.info("새 슬롯이 열리면 SMS로 알려드릴게요.");
+  spinner.stop("알림 등록됐어요");
+  p.log.info("7일 안에 새 슬롯이 열리면 SMS로 알려드릴게요.");
   return null;
 }
 
