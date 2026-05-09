@@ -24,7 +24,7 @@ export async function pickSlot(): Promise<Slot | null> {
   s.stop(`${slots.length}개 슬롯 가능`);
 
   if (slots.length === 0) {
-    p.log.warn("향후 3일 동안 가능한 슬롯이 없습니다. 매장 상황 / 영업시간을 확인해 주세요.");
+    p.log.warn("향후 3일 동안 가능한 슬롯이 없어요. 매장 상황 / 영업시간을 확인해 주세요.");
     return null;
   }
 

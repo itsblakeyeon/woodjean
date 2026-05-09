@@ -21,3 +21,8 @@ export function formatPhone(p: string): string {
   if (p.length === 10) return `${p.slice(0, 3)}-${p.slice(3, 6)}-${p.slice(6)}`;
   return p;
 }
+
+export function formatPhoneRedacted(phone: string): string {
+  if (phone.length < 10) return phone;
+  return `${phone.slice(0, 3)}-XXXX-${phone.slice(-4)}`;
+}

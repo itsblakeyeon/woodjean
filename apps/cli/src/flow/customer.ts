@@ -43,7 +43,7 @@ export async function collectCustomer(): Promise<Customer | null> {
   });
   if (p.isCancel(memo)) return null;
 
-  p.log.warn("⚠️  발송된 SMS는 회신 불가입니다. 변경/취소는 매장(010-8484-2120)으로 연락 주세요.");
+  p.log.warn("⚠️  발송된 SMS는 회신이 안 돼요. 변경/취소는 매장(010-8484-2120)으로 연락해 주세요.");
 
   return {
     nickname: nickname.trim(),

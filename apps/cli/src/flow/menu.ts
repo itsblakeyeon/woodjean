@@ -34,7 +34,7 @@ export async function buildCart(): Promise<CartItem[] | null> {
     );
 
     const action = await p.select<"add" | "review" | "done" | "cancel">({
-      message: "다음 작업을 선택하세요",
+      message: "다음 작업을 선택해 주세요",
       options: [
         { value: "add", label: "➕ 음료 추가" },
         ...(cart.length > 0 ? ([{ value: "review", label: "🛒 카트 보기/삭제" }] as const) : []),
@@ -55,7 +55,7 @@ export async function buildCart(): Promise<CartItem[] | null> {
 
     // add
     if (cart.length >= 30) {
-      p.log.warn("최대 30잔까지 주문 가능합니다.");
+      p.log.warn("최대 30잔까지 주문 가능해요.");
       continue;
     }
     const item = await pickOneItem();

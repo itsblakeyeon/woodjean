@@ -26,7 +26,7 @@ program
 
 program
   .command("menu")
-  .description("우드진 전체 메뉴 + 가격을 보여줍니다")
+  .description("우드진 전체 메뉴 + 가격을 보여줘요")
   .action(() => {
     splash();
     for (const category of CATEGORY_ORDER) {
@@ -47,7 +47,7 @@ const ORDER_STEPS: Step[] = [
 
 program
   .command("order", { isDefault: true })
-  .description("단체주문을 시작합니다")
+  .description("단체주문을 시작해요")
   .action(async () => {
     splash();
     p.intro("우드진 단체주문");
@@ -56,10 +56,10 @@ program
       const persisted = await loadDraft();
       if (persisted) {
         const restore = await p.confirm({
-          message: "지난 미제출 주문이 있습니다. 복원할까요?",
+          message: "지난 미제출 주문이 있어요. 복원할까요?",
           initialValue: true,
         });
-        if (p.isCancel(restore)) return p.cancel("주문이 취소되었습니다.");
+        if (p.isCancel(restore)) return p.cancel("주문이 취소됐어요.");
         if (restore) {
           const submitStatus = await confirmAndSubmitPayload(persisted.payload, persisted.savedAt);
           if (submitStatus !== "slot_taken") return finishSubmit(submitStatus);
@@ -81,7 +81,7 @@ program
       let draft: OrderDraft = {};
       for (const step of ORDER_STEPS) {
         const result = await step(draft);
-        if (!result.ok) return p.cancel(result.reason ?? "주문이 취소되었습니다.");
+        if (!result.ok) return p.cancel(result.reason ?? "주문이 취소됐어요.");
         draft = result.draft;
       }
 
@@ -107,7 +107,7 @@ async function retryWithNewSlot(draft: OrderDraft): Promise<SubmitStatus> {
 
 async function finishSubmit(status: SubmitStatus): Promise<void> {
   if (status === "submitted") {
-    p.outro("감사합니다.");
+    p.outro("감사해요.");
     return;
   }
   if (status === "network_failed") {

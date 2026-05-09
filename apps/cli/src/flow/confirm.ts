@@ -6,7 +6,7 @@ import qrcode from "qrcode-terminal";
 import stringWidth from "string-width";
 import { priceItem } from "@woodjean/shared/pricing";
 import { createOrder, type CreateOrderPayload } from "../lib/api";
-import { formatKstWindow, formatPhone, formatPrice } from "../lib/format";
+import { formatKstWindow, formatPhoneRedacted, formatPrice } from "../lib/format";
 import type { CartItem } from "./menu";
 import type { DeliveryAddress } from "./delivery";
 import type { Customer } from "./customer";
@@ -112,7 +112,7 @@ export async function confirmAndSubmitPayload(payload: CreateOrderPayload, resto
   p.log.message(formatSummaryBox([
     `🕒 도착: ${formatKstWindow(payload.deliveryAt)}`,
     `📦 잔수: ${cart.length}잔  💰 ${formatPrice(total)} (현장 후불)`,
-    `👤 ${payload.nickname} · ${formatPhone(payload.phone)}`,
+    `👤 ${payload.nickname} · ${formatPhoneRedacted(payload.phone)}`,
     `📍 ${payload.deliveryAddress.building}${payload.deliveryAddress.floor ? " " + payload.deliveryAddress.floor : ""}${payload.deliveryAddress.location ? " (" + payload.deliveryAddress.location + ")" : ""} / ${payload.deliveryAddress.recipient}`,
     "",
     ...cart.map((it) => `  • ${it.displayName} — ${formatPrice(it.subtotal)}`),
@@ -124,7 +124,7 @@ export async function confirmAndSubmitPayload(payload: CreateOrderPayload, resto
     initialValue: true,
   });
   if (p.isCancel(finalOk) || !finalOk) {
-    p.cancel("주문이 취소되었습니다.");
+    p.cancel("주문이 취소됐어요.");
     return "cancelled";
   }
 
@@ -188,7 +188,7 @@ export async function confirmAndSubmitPayload(payload: CreateOrderPayload, resto
     const recvUrl = `https://woodjean-pangyo.com/order/${result.orderId}`;
     console.log("");
     p.log.success([
-      "✅  주문이 접수됐습니다.",
+      "✅  주문이 접수됐어요.",
       `   주문 ID: ${result.orderId}`,
       `   ${formatKstWindow(result.deliveryAt)} 도착 예정`,
       `   ${result.cupCount}잔 · ${formatPrice(result.totalAmount)} (현장 후불)`,
