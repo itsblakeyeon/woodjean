@@ -27,17 +27,26 @@ export async function buildCart(): Promise<CartItem[] | null> {
   const cart: CartItem[] = [];
 
   while (true) {
-    p.log.info(
-      cart.length === 0
-        ? "음료를 추가해 주세요 (최소 5잔 / 최대 30잔)"
-        : `현재 ${cart.length}잔 — ${formatPrice(cart.reduce((s, it) => s + it.subtotal, 0))}`,
-    );
+    if (cart.length === 0) {
+      p.log.info("음료를 추가해 주세요 (최소 5잔 / 최대 30잔)");
+    } else {
+      const total = cart.reduce((s, it) => s + it.subtotal, 0);
+      const groups = groupCart(cart);
+      const lines = groups.map((g, i) => {
+        const qty = g.quantity === 1 ? "" : ` × ${g.quantity}잔`;
+        return `  ${i + 1}. ${g.displayName}${qty} — ${formatPrice(g.subtotal)}`;
+      });
+      p.note(
+        lines.join("\n"),
+        `🛒 현재 카트 (${cart.length}잔, ${formatPrice(total)})`,
+      );
+    }
 
     const action = await p.select<"add" | "review" | "done" | "cancel">({
       message: "다음 작업을 선택해 주세요",
       options: [
         { value: "add", label: "➕ 음료 추가" },
-        ...(cart.length > 0 ? ([{ value: "review", label: "🛒 카트 보기/삭제" }] as const) : []),
+        ...(cart.length > 0 ? ([{ value: "review", label: "🗑  카트에서 삭제" }] as const) : []),
         ...(cart.length >= 5 ? ([{ value: "done", label: "✅ 주문 진행 (잔수 OK)" }] as const) : []),
         { value: "cancel", label: "❌ 주문 취소" },
       ],
@@ -232,4 +241,24 @@ function formatOptions(o: { shot: boolean; milkChange: boolean; decaf: boolean }
   if (o.milkChange) parts.push("우유변경");
   if (o.decaf) parts.push("디카페인");
   return parts.length > 0 ? ` [${parts.join(",")}]` : "";
+}
+
+function groupCart(
+  cart: CartItem[],
+): Array<{ displayName: string; quantity: number; subtotal: number }> {
+  const groups = new Map<string, { displayName: string; quantity: number; subtotal: number }>();
+  for (const item of cart) {
+    const existing = groups.get(item.displayName);
+    if (existing) {
+      existing.quantity += 1;
+      existing.subtotal += item.subtotal;
+    } else {
+      groups.set(item.displayName, {
+        displayName: item.displayName,
+        quantity: 1,
+        subtotal: item.subtotal,
+      });
+    }
+  }
+  return [...groups.values()];
 }
