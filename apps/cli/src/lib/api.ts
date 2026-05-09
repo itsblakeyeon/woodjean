@@ -11,7 +11,7 @@ const SlotSchema = z.object({
 
 export type Slot = z.infer<typeof SlotSchema>;
 
-export async function listSlots(days = 3): Promise<Slot[]> {
+export async function listSlots(days = 7): Promise<Slot[]> {
   const res = await fetch(`${API_BASE}/api/slots?days=${days}`);
   if (!res.ok) throw new Error(`슬롯 조회 실패 (${res.status})`);
   const json = (await res.json()) as { ok: boolean; slots?: unknown };
