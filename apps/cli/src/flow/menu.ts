@@ -15,7 +15,7 @@ import type { OrderDraft } from "./draft";
 
 export type CartItem = OrderItemInput & { displayName: string; subtotal: number };
 
-const CATEGORY_ORDER: MenuCategory[] = ["signature", "coffee", "non-coffee"];
+export const CATEGORY_ORDER: MenuCategory[] = ["signature", "coffee", "non-coffee"];
 
 export async function stepBuildCart(draft: OrderDraft): Promise<StepResult> {
   const cart = await buildCart();
@@ -181,7 +181,7 @@ async function pickOneItem(): Promise<CartItem | null> {
   };
 }
 
-function formatMenuPrice(m: MenuItem): string {
+export function formatMenuPrice(m: MenuItem): string {
   const r = m.prices.R;
   const l = m.prices.L;
   if (r != null && l != null) return `${r.toLocaleString()}~${l.toLocaleString()}원`;

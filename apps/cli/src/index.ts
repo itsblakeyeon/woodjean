@@ -2,10 +2,11 @@ import { Command } from "commander";
 import * as p from "@clack/prompts";
 import { splash } from "./splash";
 import { stepPickSlot } from "./flow/slot";
-import { stepBuildCart } from "./flow/menu";
+import { CATEGORY_ORDER, formatMenuPrice, stepBuildCart } from "./flow/menu";
 import { stepCollectDelivery } from "./flow/delivery";
 import { stepCollectCustomer } from "./flow/customer";
 import { stepCollectConsent } from "./flow/consent";
+import { CATEGORY_LABEL, MENU_BY_CATEGORY } from "@woodjean/shared/menu";
 import {
   buildCartFromPayload,
   confirmAndSubmitFromDraft,
@@ -22,6 +23,19 @@ program
   .name("woodjean")
   .description("우드진 판교점 단체주문 CLI — 회의용 음료 5~30잔 예약 배달")
   .version(packageJson.version);
+
+program
+  .command("menu")
+  .description("우드진 전체 메뉴 + 가격을 보여줍니다")
+  .action(() => {
+    splash();
+    for (const category of CATEGORY_ORDER) {
+      console.log(`\n  ${CATEGORY_LABEL[category]}`);
+      for (const menu of MENU_BY_CATEGORY[category]) {
+        console.log(`    • ${menu.name.padEnd(20)} ${formatMenuPrice(menu)}`);
+      }
+    }
+  });
 
 const ORDER_STEPS: Step[] = [
   stepPickSlot,
