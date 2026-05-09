@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 import { menuManifestForLLM, priceItem, type OrderItemInput } from "@woodjean/shared";
 import { env } from "./env";
+import { parseCartFuzzy } from "./parse-fuzzy";
 
 export const ParsedCartItemSchema = z.object({
   menuSlug: z.string(),
@@ -39,11 +40,13 @@ const LlmResponseSchema = z.object({
 });
 
 export async function parseCartWithLLM(text: string): Promise<{ items: ParsedCartItem[]; unresolved: string[]; confidence: number }> {
-  if (!env.ANTHROPIC_API_KEY) throw new Error("llm_unavailable");
+  if (env.PARSE_FUZZY_ONLY === "1" || !env.ANTHROPIC_API_KEY) return parseCartFuzzy(text);
 
   const anthropic = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
   const started = Date.now();
-  const response = await anthropic.messages.create({
+  let response;
+  try {
+    response = await anthropic.messages.create({
     model: "claude-haiku-4-5-20251001",
     max_tokens: 1500,
     temperature: 0,
@@ -72,7 +75,10 @@ export async function parseCartWithLLM(text: string): Promise<{ items: ParsedCar
         ].join("\n"),
       },
     ],
-  });
+    });
+  } catch {
+    return parseCartFuzzy(text);
+  }
 
   const raw = response.content.find((block) => block.type === "text")?.text ?? "{}";
   const parsed = LlmResponseSchema.parse(JSON.parse(extractJson(raw)));

@@ -11,6 +11,7 @@ export type MenuOptions = {
 export type MenuItem = {
   slug: string;
   name: string;
+  aliases?: string[];
   category: MenuCategory;
   prices: { R?: number; L?: number };
   temps: Temp[];

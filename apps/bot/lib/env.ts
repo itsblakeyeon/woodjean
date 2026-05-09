@@ -18,6 +18,7 @@ const EnvSchema = z.object({
   // Anthropic (paste 메뉴 자동 인식)
   ANTHROPIC_API_KEY: z.string().min(1).optional(),
   PARSE_DAILY_LIMIT: z.string().default("5"),
+  PARSE_FUZZY_ONLY: z.string().optional(),
 
   // Cron 보호용 (Vercel Cron 헤더)
   CRON_SECRET: z.string().min(1).optional(),
