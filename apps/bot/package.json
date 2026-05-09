@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.95.1",
     "@supabase/supabase-js": "^2.46.1",
     "@woodjean/shared": "workspace:*",
     "nanoid": "^5.0.9",

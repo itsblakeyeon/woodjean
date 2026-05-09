@@ -15,6 +15,10 @@ const EnvSchema = z.object({
   SOLAPI_API_SECRET: z.string().min(1).optional(),
   SOLAPI_FROM_NUMBER: z.string().min(1).optional(),
 
+  // Anthropic (paste 메뉴 자동 인식)
+  ANTHROPIC_API_KEY: z.string().min(1).optional(),
+  PARSE_DAILY_LIMIT: z.string().default("5"),
+
   // Cron 보호용 (Vercel Cron 헤더)
   CRON_SECRET: z.string().min(1).optional(),
 
