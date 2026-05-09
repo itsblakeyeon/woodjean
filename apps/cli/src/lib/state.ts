@@ -53,7 +53,6 @@ const StateV2Schema = z.object({
   recentOrders: z.array(LastOrderSchema).default([]),
   recentBuildings: z.array(z.string()).default([]),
   visitCount: z.number().int().nonnegative().default(0),
-  pasteConsentedAt: z.string().optional(),
 });
 
 export type LastOrder = z.infer<typeof LastOrderSchema>;
@@ -108,19 +107,6 @@ export async function saveLastOrder(lastOrder: LastOrder): Promise<void> {
     recentOrders: [lastOrder, ...(current?.recentOrders ?? []).filter((order) => order.orderId !== lastOrder.orderId)].slice(0, 10),
     recentBuildings,
     visitCount: (current?.visitCount ?? 0) + 1,
-    pasteConsentedAt: current?.pasteConsentedAt,
-  });
-}
-
-export async function markPasteConsented(consentedAt: string = new Date().toISOString()): Promise<void> {
-  const current = await loadState();
-  await saveState({
-    schemaVersion: 2,
-    lastOrder: current?.lastOrder,
-    recentOrders: current?.recentOrders ?? [],
-    recentBuildings: current?.recentBuildings ?? [],
-    visitCount: current?.visitCount ?? 0,
-    pasteConsentedAt: consentedAt,
   });
 }
 
@@ -145,6 +131,5 @@ function migrateV1ToV2(v1: z.infer<typeof StateV1Schema>): WoodjeanState {
     recentOrders: v1.lastOrder ? [v1.lastOrder] : [],
     recentBuildings: v1.recentBuildings,
     visitCount: v1.visitCount,
-    pasteConsentedAt: undefined,
   };
 }
