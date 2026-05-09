@@ -30,6 +30,7 @@ type OrderOptions = {
   paste?: string | boolean;
   clipboard?: boolean;
   noSplash?: boolean;
+  brand?: boolean;
   json?: boolean;
   debug?: boolean;
 };
@@ -111,13 +112,11 @@ program
   .option("--paste [source]", "붙여넣은 메뉴 목록을 자동 인식해요. @file.txt 또는 stdin 지원 예정")
   .option("--clipboard", "--paste와 함께 클립보드 내용을 사용해요")
   .option("--no-splash", "시작 배너를 생략해요")
+  .option("--brand", "방문 횟수와 무관하게 풀 브랜드 배너를 보여줘요")
   .option("--json", "machine-readable 영수증을 출력해요")
   .option("--debug", "verbose API 호출 로그를 켜요 (휴대폰 마스킹)")
   .action(async (options: OrderOptions) => {
     if (options.debug) process.env.WOODJEAN_DEBUG = "1";
-    if (!options.noSplash) splash();
-    p.intro("우드진 단체주문");
-    warnForPinnedPlaceholders(options);
 
     try {
       try {
@@ -126,6 +125,15 @@ program
         p.log.warn(`디바이스 ID 저장 실패: ${e instanceof Error ? e.message : String(e)}`);
       }
       const state = await loadState();
+      if (!options.noSplash) {
+        splash({
+          visitCount: state?.visitCount,
+          nickname: state?.lastOrder?.nickname,
+          forceBrand: options.brand,
+        });
+      }
+      p.intro("우드진 단체주문");
+      warnForPinnedPlaceholders(options);
 
       const persisted = await loadDraft();
       if (persisted) {
