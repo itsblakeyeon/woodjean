@@ -10,6 +10,7 @@ import { formatKstWindow, formatPhone, formatPrice } from "../lib/format";
 import type { CartItem } from "./menu";
 import type { DeliveryAddress } from "./delivery";
 import type { Customer } from "./customer";
+import type { OrderDraft } from "./draft";
 
 type ConfirmInput = {
   deliveryAt: string;
@@ -18,9 +19,21 @@ type ConfirmInput = {
   customer: Customer;
 };
 
+export async function confirmAndSubmitFromDraft(draft: OrderDraft): Promise<SubmitStatus> {
+  if (!draft.slot || !draft.cart || !draft.delivery || !draft.customer || !draft.agreed) {
+    throw new Error("OrderDraft 미완 — confirm 단계 호출 전 모든 step 통과 필요");
+  }
+  return confirmAndSubmit({
+    deliveryAt: draft.slot.deliveryAt,
+    cart: draft.cart,
+    delivery: draft.delivery,
+    customer: draft.customer,
+  });
+}
+
 export type SubmitStatus = "submitted" | "cancelled" | "network_failed" | "server_rejected" | "slot_taken";
 
-export type OrderDraft = {
+export type PersistedDraft = {
   schemaVersion: 1;
   savedAt: string;
   payload: CreateOrderPayload;
@@ -53,14 +66,14 @@ export async function clearDraft(): Promise<void> {
   await rm(DRAFT_PATH, { force: true });
 }
 
-export async function loadDraft(): Promise<OrderDraft | null> {
+export async function loadDraft(): Promise<PersistedDraft | null> {
   try {
     const raw = await readFile(DRAFT_PATH, "utf8");
-    const parsed = JSON.parse(raw) as Partial<OrderDraft>;
+    const parsed = JSON.parse(raw) as Partial<PersistedDraft>;
     if (parsed.schemaVersion !== 1 || typeof parsed.savedAt !== "string" || !parsed.payload) {
       return null;
     }
-    return parsed as OrderDraft;
+    return parsed as PersistedDraft;
   } catch {
     return null;
   }

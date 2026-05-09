@@ -10,10 +10,18 @@ import {
 } from "@woodjean/shared/menu";
 import { priceItem, type OrderItemInput } from "@woodjean/shared/pricing";
 import { formatPrice } from "../lib/format";
+import { cancel, ok, type StepResult } from "./draft";
+import type { OrderDraft } from "./draft";
 
 export type CartItem = OrderItemInput & { displayName: string; subtotal: number };
 
 const CATEGORY_ORDER: MenuCategory[] = ["signature", "coffee", "non-coffee"];
+
+export async function stepBuildCart(draft: OrderDraft): Promise<StepResult> {
+  const cart = await buildCart();
+  if (!cart || cart.length === 0) return cancel();
+  return ok({ ...draft, cart });
+}
 
 export async function buildCart(): Promise<CartItem[] | null> {
   const cart: CartItem[] = [];

@@ -1,6 +1,14 @@
 import * as p from "@clack/prompts";
 import { listSlots, type Slot } from "../lib/api";
 import { formatKstWindow } from "../lib/format";
+import { cancel, ok, type StepResult } from "./draft";
+import type { OrderDraft } from "./draft";
+
+export async function stepPickSlot(draft: OrderDraft): Promise<StepResult> {
+  const slot = await pickSlot();
+  if (!slot) return cancel();
+  return ok({ ...draft, slot });
+}
 
 export async function pickSlot(): Promise<Slot | null> {
   const s = p.spinner();

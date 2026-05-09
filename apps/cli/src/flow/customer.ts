@@ -1,10 +1,18 @@
 import * as p from "@clack/prompts";
+import { cancel, ok, type StepResult } from "./draft";
+import type { OrderDraft } from "./draft";
 
 export type Customer = {
   nickname: string;
   phone: string;
   memo?: string;
 };
+
+export async function stepCollectCustomer(draft: OrderDraft): Promise<StepResult> {
+  const customer = await collectCustomer();
+  if (!customer) return cancel();
+  return ok({ ...draft, customer });
+}
 
 export async function collectCustomer(): Promise<Customer | null> {
   const nickname = await p.text({

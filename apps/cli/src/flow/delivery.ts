@@ -1,4 +1,6 @@
 import * as p from "@clack/prompts";
+import { cancel, ok, type StepResult } from "./draft";
+import type { OrderDraft } from "./draft";
 
 export type DeliveryAddress = {
   building: string;
@@ -6,6 +8,12 @@ export type DeliveryAddress = {
   recipient: string;
   location?: string;
 };
+
+export async function stepCollectDelivery(draft: OrderDraft): Promise<StepResult> {
+  const delivery = await collectDelivery();
+  if (!delivery) return cancel();
+  return ok({ ...draft, delivery });
+}
 
 export async function collectDelivery(): Promise<DeliveryAddress | null> {
   p.log.info("배달지를 입력해 주세요. 우드진 반경 1km 이내 (도보 20분).");
