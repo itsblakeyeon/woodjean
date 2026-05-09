@@ -63,6 +63,30 @@ export async function checkPhone(phone: string): Promise<{ ok: true; blacklisted
   return { ok: true, blacklisted: json.blacklisted === true };
 }
 
+const NotifySlotResultSchema = z.object({
+  ok: z.boolean(),
+  expiresAt: z.string().optional(),
+  error: z.string().optional(),
+});
+
+export async function registerNotify(
+  phone: string,
+): Promise<{ ok: true; expiresAt: string } | { ok: false; error: string }> {
+  const res = await fetch(`${API_BASE}/api/notify-slot`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ phone }),
+  });
+  let json: z.infer<typeof NotifySlotResultSchema>;
+  try {
+    json = NotifySlotResultSchema.parse(await res.json());
+  } catch {
+    return { ok: false, error: `http_${res.status}` };
+  }
+  if (!res.ok || !json.ok) return { ok: false, error: json.error ?? `http_${res.status}` };
+  return { ok: true, expiresAt: json.expiresAt ?? "" };
+}
+
 export async function getOrder(orderId: string): Promise<unknown> {
   const res = await fetch(`${API_BASE}/api/orders/${orderId}`);
   if (!res.ok) return null;
