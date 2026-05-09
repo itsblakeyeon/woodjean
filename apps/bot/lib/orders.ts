@@ -230,6 +230,10 @@ export async function updateOrderStatus(
       reason: "no_show",
       source_order_id: orderId,
     });
+    await supabase().from("cli_events").insert({
+      event: "no_show_marked",
+      payload: { orderId },
+    });
   }
 
   // 취소 시 고객 SMS

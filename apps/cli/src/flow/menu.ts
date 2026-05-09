@@ -10,6 +10,7 @@ import {
 } from "@woodjean/shared/menu";
 import { priceItem, type OrderItemInput } from "@woodjean/shared/pricing";
 import { formatPrice } from "../lib/format";
+import { emitEvent } from "../lib/telemetry";
 import { cancel, ok, type StepResult } from "./draft";
 import type { OrderDraft } from "./draft";
 
@@ -25,6 +26,7 @@ export async function stepBuildCart(draft: OrderDraft): Promise<StepResult> {
 
 export async function buildCart(): Promise<CartItem[] | null> {
   const cart: CartItem[] = [];
+  const startedAt = Date.now();
 
   while (true) {
     if (cart.length === 0) {
@@ -54,7 +56,14 @@ export async function buildCart(): Promise<CartItem[] | null> {
 
     if (p.isCancel(action) || action === "cancel") return null;
 
-    if (action === "done") return cart;
+    if (action === "done") {
+      await emitEvent("cart_completed", {
+        cupCount: cart.length,
+        nUniqueItems: new Set(cart.map((item) => item.displayName)).size,
+        timeToCompleteMs: Date.now() - startedAt,
+      });
+      return cart;
+    }
 
     if (action === "review") {
       const removed = await reviewCart(cart);

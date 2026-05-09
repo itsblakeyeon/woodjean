@@ -17,6 +17,7 @@ import {
   type SubmitStatus,
 } from "./flow/confirm";
 import { ensureDeviceId, loadState } from "./lib/state";
+import { emitEvent, isHotState } from "./lib/telemetry";
 import type { OrderDraft, Step } from "./flow/draft";
 import packageJson from "../package.json";
 
@@ -136,6 +137,10 @@ program
       }
       p.intro("우드진 단체주문");
       warnForPinnedPlaceholders(options);
+      await emitEvent("cli_start", {
+        version: packageJson.version,
+        isHot: isHotState(state),
+      });
 
       const persisted = await loadDraft();
       if (persisted) {

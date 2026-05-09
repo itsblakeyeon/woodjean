@@ -1,6 +1,7 @@
 import * as p from "@clack/prompts";
 import { listSlots, type Slot } from "../lib/api";
 import { formatKstWindow } from "../lib/format";
+import { emitEvent } from "../lib/telemetry";
 import { cancel, ok, type StepResult } from "./draft";
 import type { OrderDraft } from "./draft";
 
@@ -56,7 +57,14 @@ export async function pickSlot(): Promise<Slot | null> {
     })),
   });
   if (p.isCancel(choice)) return null;
-  return daySlots.find((s) => s.deliveryAt === choice) ?? null;
+  const slot = daySlots.find((s) => s.deliveryAt === choice) ?? null;
+  if (slot) {
+    await emitEvent("slot_picked", {
+      leadMinutes: Math.max(0, Math.round((new Date(slot.deliveryAt).getTime() - Date.now()) / 60_000)),
+      hour: new Date(slot.deliveryAt).getHours(),
+    });
+  }
+  return slot;
 }
 
 function formatDayLabel(day: string): string {

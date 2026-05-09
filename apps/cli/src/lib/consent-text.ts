@@ -10,6 +10,7 @@ export const CONSENT_SUMMARY = `
 이용 목적: 단체주문 접수·배달·결제·CS, 노쇼 이력 관리
 보유 기간: 주문일로부터 5년 (전자상거래법) 후 파기
 처리 위탁: Solapi(SMS), Telegram(주문 알림)
+익명 측정: CLI 시작·카트 완료·주문 성공/실패 이벤트를 개인 식별 없이 기록
 
 전체 약관: https://woodjean-pangyo.com/terms
 개인정보 처리방침: https://woodjean-pangyo.com/privacy

@@ -8,6 +8,7 @@ import { priceItem } from "@woodjean/shared/pricing";
 import { createOrder, type CreateOrderPayload } from "../lib/api";
 import { formatKstWindow, formatPhoneRedacted, formatPrice } from "../lib/format";
 import { saveLastOrder } from "../lib/state";
+import { emitEvent } from "../lib/telemetry";
 import type { CartItem } from "./menu";
 import type { DeliveryAddress } from "./delivery";
 import type { Customer } from "./customer";
@@ -137,8 +138,10 @@ export async function confirmAndSubmitPayload(payload: CreateOrderPayload, resto
 
   const s = p.spinner();
   let attempt = 1;
+  const submitStartedAt = Date.now();
   while (true) {
     s.start(attempt === 1 ? "주문 접수 중" : `재시도 중 (${attempt}/${MAX_SUBMIT_ATTEMPTS})`);
+    await emitEvent("order_submitted", { usedL1Prefill: false, usedL2Paste: false, attemptN: attempt });
     let result;
     try {
       result = await createOrder(payload);
@@ -152,6 +155,7 @@ export async function confirmAndSubmitPayload(payload: CreateOrderPayload, resto
           "해결: 잠시 후 다시 시도해 주세요. 급하시면 매장(010-8484-2120)으로 전화 주세요.",
           `주문 정보는 ${DRAFT_PATH}에 저장됐어요.`,
         ].join("\n"));
+        await emitEvent("order_failed", { errorCode: "network_failed", attemptN: attempt });
         return "network_failed";
       }
       attempt += 1;
@@ -167,6 +171,7 @@ export async function confirmAndSubmitPayload(payload: CreateOrderPayload, resto
           "해결: 다른 도착 시간을 선택해 주세요. 카트와 연락처는 그대로 유지됩니다.",
           `주문 정보는 ${DRAFT_PATH}에 저장됐어요.`,
         ].join("\n"));
+        await emitEvent("order_failed", { errorCode: "slot_taken", attemptN: attempt });
         return "slot_taken";
       }
       if (result.error === "outside_radius") {
@@ -176,10 +181,12 @@ export async function confirmAndSubmitPayload(payload: CreateOrderPayload, resto
           "해결: 다른 건물로 변경하거나 매장(010-8484-2120)으로 문의해 주세요.",
           `주문 정보는 ${DRAFT_PATH}에 저장됐어요.`,
         ].join("\n"));
+        await emitEvent("order_failed", { errorCode: result.error, attemptN: attempt });
         return "server_rejected";
       }
       if (result.error === "blacklisted") {
         p.log.error("이 번호로는 주문 접수가 어려워요. 사장님(010-8484-2120)으로 직접 연락 부탁드립니다.");
+        await emitEvent("order_failed", { errorCode: result.error, attemptN: attempt });
         return "server_rejected";
       }
       if (result.error === "outside_hours" || result.error === "paused") {
@@ -188,6 +195,7 @@ export async function confirmAndSubmitPayload(payload: CreateOrderPayload, resto
           `원인: ${result.message}`,
           "해결: 다음 가능 시간을 다시 선택해 주세요. 알림은 매장으로 카카오 부탁드려요.",
         ].join("\n"));
+        await emitEvent("order_failed", { errorCode: result.error, attemptN: attempt });
         return "server_rejected";
       }
       p.log.error([
@@ -196,6 +204,7 @@ export async function confirmAndSubmitPayload(payload: CreateOrderPayload, resto
         "해결: 메시지에 맞춰 다시 시도해 주세요. 급하시면 매장(010-8484-2120)으로 전화 주세요.",
         `주문 정보는 ${DRAFT_PATH}에 저장됐어요.`,
       ].join("\n"));
+      await emitEvent("order_failed", { errorCode: result.error, attemptN: attempt });
       return "server_rejected";
     }
 
@@ -218,6 +227,11 @@ export async function confirmAndSubmitPayload(payload: CreateOrderPayload, resto
     } catch (e) {
       p.log.warn(`최근 주문 저장 실패: ${e instanceof Error ? e.message : String(e)}`);
     }
+    await emitEvent("order_completed", {
+      timeTotalMs: Date.now() - submitStartedAt,
+      usedL1: false,
+      usedL2: false,
+    });
 
     // 영수증
     const recvUrl = `https://woodjean-pangyo.com/order/${result.orderId}`;
