@@ -6,6 +6,7 @@ import { CATEGORY_ORDER, formatMenuPrice, stepBuildCart } from "./flow/menu";
 import { stepCollectDelivery } from "./flow/delivery";
 import { stepCollectCustomer } from "./flow/customer";
 import { stepCollectConsent } from "./flow/consent";
+import { runRouter } from "./flow/router";
 import { CATEGORY_LABEL, MENU_BY_CATEGORY } from "@woodjean/shared/menu";
 import {
   buildCartFromPayload,
@@ -14,7 +15,7 @@ import {
   loadDraft,
   type SubmitStatus,
 } from "./flow/confirm";
-import { ensureDeviceId, getTier, loadState } from "./lib/state";
+import { ensureDeviceId, loadState } from "./lib/state";
 import type { OrderDraft, Step } from "./flow/draft";
 import packageJson from "../package.json";
 
@@ -125,10 +126,6 @@ program
         p.log.warn(`디바이스 ID 저장 실패: ${e instanceof Error ? e.message : String(e)}`);
       }
       const state = await loadState();
-      const previousLastOrder =
-        !options.new && state?.lastOrder && getTier(state.lastOrder.savedAt) !== "expired"
-          ? state.lastOrder
-          : undefined;
 
       const persisted = await loadDraft();
       if (persisted) {
@@ -155,23 +152,46 @@ program
         }
       }
 
-      let draft: OrderDraft = previousLastOrder ? { previousLastOrder } : {};
-      for (const step of ORDER_STEPS) {
-        const result = await step(draft);
-        if (!result.ok) return cancelOrder(result.reason ?? "주문이 취소됐어요.");
-        draft = result.draft;
+      if (!options.new) {
+        const router = await runRouter(state);
+        if (router.action === "cancelled") return cancelOrder(router.reason ?? "주문이 취소됐어요.");
+        if (router.action === "history") {
+          p.log.warn("history는 KAI-178에서 최근 주문 이력으로 연결돼요.");
+          return;
+        }
+        if (router.action === "repeat") {
+          const slotResult = await stepPickSlot(router.draft);
+          if (!slotResult.ok) return cancelOrder(slotResult.reason ?? "주문이 취소됐어요.");
+          let submitStatus = await confirmAndSubmitFromDraft(slotResult.draft);
+          if (submitStatus === "slot_taken") {
+            submitStatus = await retryWithNewSlot(slotResult.draft);
+          }
+          return finishSubmit(submitStatus);
+        }
+        return runManualOrder(router.draft);
       }
 
-      let submitStatus = await confirmAndSubmitFromDraft(draft);
-      if (submitStatus === "slot_taken") {
-        submitStatus = await retryWithNewSlot(draft);
-      }
-      return finishSubmit(submitStatus);
+      return runManualOrder({});
     } catch (e) {
       p.cancel(`오류: ${e instanceof Error ? e.message : String(e)}`);
       process.exitCode = EXIT_NETWORK_FAILURE;
     }
   });
+
+async function runManualOrder(initialDraft: OrderDraft): Promise<void> {
+  let draft: OrderDraft = initialDraft;
+  for (const step of ORDER_STEPS) {
+    const result = await step(draft);
+    if (!result.ok) return cancelOrder(result.reason ?? "주문이 취소됐어요.");
+    draft = result.draft;
+  }
+
+  let submitStatus = await confirmAndSubmitFromDraft(draft);
+  if (submitStatus === "slot_taken") {
+    submitStatus = await retryWithNewSlot(draft);
+  }
+  return finishSubmit(submitStatus);
+}
 
 function warnForPinnedPlaceholders(options: OrderOptions): void {
   if (options.yes) p.log.warn("--yes는 L1 repeat 구현 후 자동 재제출로 연결돼요. 지금은 수동 확인으로 진행해요.");
