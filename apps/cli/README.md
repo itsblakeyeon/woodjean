@@ -1,62 +1,131 @@
 # woodjean
 
-판교 우드진 카페의 단체주문 CLI. 회의용 음료 5~30잔, 한 줄로 예약 배달.
+[![npm](https://img.shields.io/npm/v/woodjean)](https://www.npmjs.com/package/woodjean)
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/itsblakeyeon/woodjean)
+
+판교 우드진 카페의 단체주문 CLI. 회의용 음료 5~30잔을 터미널에서 예약 배달해요.
 
 ```bash
 npx woodjean order
 ```
 
+## 왜 CLI인가
+
+판교 개발자들이 이미 쓰는 터미널에서 팀 음료 주문을 끝내기 위해 만들었어요. Slack이나 회의 메모를 보다가 바로 주문하고, 다음 주문부터는 같은 배달지와 연락처를 재사용하는 흐름을 목표로 합니다.
+
+## 명령어
+
+```bash
+npx woodjean order
+npx woodjean order --new
+pbpaste | npx woodjean order --paste
+npx woodjean menu
+npx woodjean history
+```
+
+| Flag | 설명 |
+| --- | --- |
+| `--yes`, `-y` | 같은 주문 재제출용 non-interactive 모드 |
+| `--new` | 저장된 단골 정보를 건너뛰고 새 주문 시작 |
+| `--paste` | stdin 또는 `@file.txt` 메뉴 목록 자동 인식 |
+| `--paste --clipboard` | 클립보드 메뉴 목록 자동 인식 |
+| `--no-splash` | 시작 배너 생략 |
+| `--json` | machine-readable 영수증 출력 |
+| `--debug` | API 호출 디버그 로그 출력. 휴대폰은 마스킹 |
+
+## 첫 주문 예시
+
+```text
+$ npx woodjean order
+
+WOODJEAN
+우드진 단체주문
+
+◇  도착 날짜를 선택해 주세요
+◇  도착 시간을 선택해 주세요 (lead time 1시간)
+◇  다음 작업을 선택해 주세요
+◇  건물명 (예: 유스페이스2 A동)
+◇  닉네임 (사장님이 영수증/메시지에 사용)
+◇  위 내용에 모두 동의하시나요?
+
+✅  주문이 접수됐어요.
+   주문 ID: ord_xxxxxxxxxxxxxxxx
+   5잔 · 23,000원 (현장 후불)
+   영수증: https://woodjean-pangyo.com/order/ord_xxxxxxxxxxxxxxxx
+```
+
 ## 흐름
 
-```
-██╗    ██╗ ██████╗  ██████╗ ██████╗      ██╗███████╗ █████╗ ███╗   ██╗
-██║    ██║██╔═══██╗██╔═══██╗██╔══██╗     ██║██╔════╝██╔══██╗████╗  ██║
-██║ █╗ ██║██║   ██║██║   ██║██║  ██║     ██║█████╗  ███████║██╔██╗ ██║
-██║███╗██║██║   ██║██║   ██║██║  ██║██   ██║██╔══╝  ██╔══██║██║╚██╗██║
-╚███╔███╔╝╚██████╔╝╚██████╔╝██████╔╝╚█████╔╝███████╗██║  ██║██║ ╚████║
- ╚══╝╚══╝  ╚═════╝  ╚═════╝ ╚═════╝  ╚════╝ ╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝
-
-  WOOD JEAN IN THE GREY BUILDINGS
-  판교 우드진 — 회의용 음료 단체주문 (5~30잔)
+```text
+L1 repeat       ~/.woodjean/state.json
+     │
+     ▼
+L2 paste        Slack/Kakao list -> parse-cart
+     │
+     ▼
+L3 manual       slot -> cart -> delivery -> customer -> consent -> confirm
 ```
 
-5단계 + Enter:
-
-1. **📅 도착 시간 선택** — 1시간 단위 슬롯 (예: `13:30~14:30`). 영업시간 + 1시간 lead time 적용. 시간당 1건만 접수.
-2. **☕ 메뉴 + 사이즈/온도/옵션 + 잔수** — 시그니처 / 커피 / 논커피 27종.
-3. **📍 배달지** — 건물 + 층 + 수령자 + (선택) 위치.
-4. **☎ 닉네임 + 휴대폰** — 매장이 컨펌 SMS 보낼 곳.
-5. **📜 약관 + PIPA 동의** → 제출.
-
-제출하면 즉시 SMS 한 통:
-
-```
-[우드진] {닉}님 주문 5잔 05/05 13:30 도착 예정으로 접수됐어요. 회신 불가.
-```
-
-배경에서 사장님 텔레그램에 자동 알림이 가고 사장님이 음료를 준비합니다. 도착 30분 전 reminder SMS 한 통 더:
-
-```
-[우드진] {닉}님, 05/05 13:30 도착 30분 전입니다. 변경/취소는 매장(010-8484-2120)으로 연락 주세요.
-```
-
-배달 받고 현장에서 카드 / 송금 / 이체 자유 결제. 끝.
-
-## 비즈니스 룰
-
-- 5~30잔, 1시간 단위 슬롯, 슬롯당 1건만 접수
-- 단체할인 / 배달비 = 0원 (추가금 없음)
-- 결제 = 후불 (현장 사장님 직접 수령)
-- 노쇼 1회 = 자동 블랙리스트 (다음 주문 차단)
-- 변경/취소는 매장으로 직접 연락
+1. 도착 시간 선택: 평일 영업시간과 1시간 lead time 적용. 시간당 1건만 접수해요.
+2. 메뉴 선택: 시그니처 / 커피 / 논커피 메뉴에서 사이즈, 온도, 옵션, 잔수를 고릅니다.
+3. 배달지 입력: 건물, 층/호, 수령자, 수령 위치를 입력해요.
+4. 고객 정보: 닉네임과 휴대폰 번호를 입력해요.
+5. 약관과 개인정보 수집·이용 동의 후 주문을 제출해요.
 
 ## 운영 정보
 
 - 매장: 우드진 (WOODJEAN), 판교테크노밸리 유스페이스1
-- 영업시간: 평일 09:00~11:00, 13:30~16:30 (주말 휴무)
-- 배달 범위: 매장 반경 1km (도보 20분)
+- 영업시간: 평일 09:00~11:00, 13:30~16:30. 주말 휴무
+- 배달 범위: 매장 반경 1km, 도보 20분
 - 매장 전화: 010-8484-2120
 - 사이트: https://woodjean-pangyo.com
+- 결제: 후불. 배달 시 카드, 송금, 이체 가능
+
+## Troubleshooting
+
+**가능한 시간이 없어요**
+
+향후 3일 슬롯이 모두 찼거나 매장이 일시 중지 상태일 수 있어요. 급하면 매장(010-8484-2120)으로 문의해 주세요.
+
+**배달지가 범위 밖이라고 나와요**
+
+우드진 반경 1km 밖이면 접수가 어려워요. 다른 건물로 변경하거나 매장에 직접 문의해 주세요.
+
+**SMS가 안 와요**
+
+휴대폰 번호를 다시 확인해 주세요. SMS는 회신이 안 되므로 변경이나 취소는 매장으로 연락해 주세요.
+
+**주문을 변경하거나 취소하고 싶어요**
+
+v1.1에서는 고객용 취소 API가 없어요. 매장(010-8484-2120)으로 직접 연락해 주세요.
+
+## Environment
+
+| Env | 설명 |
+| --- | --- |
+| `WOODJEAN_API_URL` | 주문 API URL override |
+| `NO_COLOR` | ANSI 색상 비활성화 |
+| `WOODJEAN_DEBUG=1` | 디버그 로그 출력. 휴대폰은 마스킹 |
+| `WOODJEAN_FAST=1` | 빠른 실행 모드 |
+
+## Exit codes
+
+| Code | Meaning |
+| --- | --- |
+| 0 | success |
+| 1 | user cancellation |
+| 2 | input validation failure |
+| 3 | slot unavailable / out of business hours |
+| 4 | blacklisted phone |
+| 5 | API/network failure (retryable) |
+| 6 | server-side rejection (not retryable) |
+| 7 | config/env error |
+
+## Links
+
+- GitHub: https://github.com/itsblakeyeon/woodjean
+- v1.0.2 changes: https://github.com/itsblakeyeon/woodjean/commit/3a2ef57
+- v1.1 work: https://github.com/itsblakeyeon/woodjean/commits/main
 
 ## 라이선스
 

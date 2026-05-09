@@ -18,11 +18,55 @@ import type { OrderDraft, Step } from "./flow/draft";
 import packageJson from "../package.json";
 
 const program = new Command();
+const EXIT_USER_CANCEL = 1;
+const EXIT_NETWORK_FAILURE = 5;
+const EXIT_SERVER_REJECTION = 6;
+
+type OrderOptions = {
+  yes?: boolean;
+  new?: boolean;
+  paste?: string | boolean;
+  clipboard?: boolean;
+  noSplash?: boolean;
+  json?: boolean;
+  debug?: boolean;
+};
 
 program
   .name("woodjean")
   .description("우드진 판교점 단체주문 CLI — 회의용 음료 5~30잔 예약 배달")
-  .version(packageJson.version);
+  .version(packageJson.version)
+  .showHelpAfterError()
+  .addHelpText("after", `
+
+Examples:
+  $ npx woodjean order
+  $ npx woodjean order --new
+  $ pbpaste | npx woodjean order --paste
+  $ npx woodjean menu
+  $ npx woodjean history
+
+Environment:
+  WOODJEAN_API_URL      주문 API URL override
+  NO_COLOR             ANSI 색상 비활성화
+  WOODJEAN_DEBUG=1     API 호출 디버그 로그 (휴대폰 마스킹)
+  WOODJEAN_FAST=1      빠른 실행 모드
+
+영업시간:
+  평일 09:00~11:00, 13:30~16:30
+  주말 휴무
+  매장 010-8484-2120
+
+Exit codes:
+  0  success
+  1  user cancellation
+  2  input validation failure
+  3  slot unavailable / out of business hours
+  4  blacklisted phone
+  5  API/network failure (retryable)
+  6  server-side rejection (not retryable)
+  7  config/env error
+`);
 
 program
   .command("menu")
@@ -35,6 +79,13 @@ program
         console.log(`    • ${menu.name.padEnd(20)} ${formatMenuPrice(menu)}`);
       }
     }
+  });
+
+program
+  .command("history")
+  .description("이 디바이스의 최근 주문 이력을 보여줘요")
+  .action(() => {
+    p.log.warn("history는 L1 state 구현 후 최근 주문 이력으로 연결돼요.");
   });
 
 const ORDER_STEPS: Step[] = [
@@ -53,9 +104,18 @@ const ORDER_STEPS: Step[] = [
 program
   .command("order", { isDefault: true })
   .description("단체주문을 시작해요")
-  .action(async () => {
-    splash();
+  .option("-y, --yes", "non-interactive로 같은 주문을 재제출해요 (L1 repeat 준비)")
+  .option("--new", "저장된 단골 정보를 건너뛰고 새 주문으로 시작해요")
+  .option("--paste [source]", "붙여넣은 메뉴 목록을 자동 인식해요. @file.txt 또는 stdin 지원 예정")
+  .option("--clipboard", "--paste와 함께 클립보드 내용을 사용해요")
+  .option("--no-splash", "시작 배너를 생략해요")
+  .option("--json", "machine-readable 영수증을 출력해요")
+  .option("--debug", "verbose API 호출 로그를 켜요 (휴대폰 마스킹)")
+  .action(async (options: OrderOptions) => {
+    if (options.debug) process.env.WOODJEAN_DEBUG = "1";
+    if (!options.noSplash) splash();
     p.intro("우드진 단체주문");
+    warnForPinnedPlaceholders(options);
 
     try {
       const persisted = await loadDraft();
@@ -64,7 +124,7 @@ program
           message: "지난 미제출 주문이 있어요. 복원할까요?",
           initialValue: true,
         });
-        if (p.isCancel(restore)) return p.cancel("주문이 취소됐어요.");
+        if (p.isCancel(restore)) return cancelOrder("주문이 취소됐어요.");
         if (restore) {
           const submitStatus = await confirmAndSubmitPayload(persisted.payload, persisted.savedAt);
           if (submitStatus !== "slot_taken") return finishSubmit(submitStatus);
@@ -86,7 +146,7 @@ program
       let draft: OrderDraft = {};
       for (const step of ORDER_STEPS) {
         const result = await step(draft);
-        if (!result.ok) return p.cancel(result.reason ?? "주문이 취소됐어요.");
+        if (!result.ok) return cancelOrder(result.reason ?? "주문이 취소됐어요.");
         draft = result.draft;
       }
 
@@ -97,9 +157,21 @@ program
       return finishSubmit(submitStatus);
     } catch (e) {
       p.cancel(`오류: ${e instanceof Error ? e.message : String(e)}`);
-      process.exit(1);
+      process.exitCode = EXIT_NETWORK_FAILURE;
     }
   });
+
+function warnForPinnedPlaceholders(options: OrderOptions): void {
+  if (options.yes) p.log.warn("--yes는 L1 repeat 구현 후 자동 재제출로 연결돼요. 지금은 수동 확인으로 진행해요.");
+  if (options.new) p.log.warn("--new는 L1 router 구현 후 저장 정보 우회로 연결돼요. 지금은 새 주문 플로우로 진행해요.");
+  if (options.paste || options.clipboard) p.log.warn("--paste는 L2 paste 구현 후 자동 인식으로 연결돼요. 지금은 직접 선택으로 진행해요.");
+  if (options.json) p.log.warn("--json은 영수증 출력 구현 후 machine-readable 출력으로 연결돼요. 지금은 기본 출력으로 진행해요.");
+}
+
+function cancelOrder(message: string): void {
+  p.cancel(message);
+  process.exitCode = EXIT_USER_CANCEL;
+}
 
 async function retryWithNewSlot(draft: OrderDraft): Promise<SubmitStatus> {
   while (true) {
@@ -116,16 +188,20 @@ async function finishSubmit(status: SubmitStatus): Promise<void> {
     return;
   }
   if (status === "network_failed") {
-    process.exitCode = 5;
+    process.exitCode = EXIT_NETWORK_FAILURE;
     return;
   }
   if (status === "server_rejected") {
-    process.exitCode = 6;
+    process.exitCode = EXIT_SERVER_REJECTION;
+    return;
+  }
+  if (status === "cancelled") {
+    process.exitCode = EXIT_USER_CANCEL;
     return;
   }
 }
 
 program.parseAsync(process.argv).catch((e) => {
   console.error(e);
-  process.exit(1);
+  process.exitCode = EXIT_NETWORK_FAILURE;
 });
