@@ -220,7 +220,7 @@ function warnForPinnedPlaceholders(options: OrderOptions): void {
 
 function cancelOrder(message: string): void {
   p.cancel(message);
-  process.exitCode = EXIT_USER_CANCEL;
+  process.exitCode ??= EXIT_USER_CANCEL;
 }
 
 async function retryWithNewSlot(draft: OrderDraft): Promise<SubmitStatus> {

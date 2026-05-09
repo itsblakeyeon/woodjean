@@ -50,6 +50,19 @@ export async function createOrder(payload: CreateOrderPayload): Promise<CreateOr
   return json;
 }
 
+const CheckPhoneResultSchema = z.object({
+  ok: z.boolean(),
+  blacklisted: z.boolean().optional(),
+  error: z.string().optional(),
+});
+
+export async function checkPhone(phone: string): Promise<{ ok: true; blacklisted: boolean } | { ok: false; error: string }> {
+  const res = await fetch(`${API_BASE}/api/check-phone?phone=${encodeURIComponent(phone)}`);
+  const json = CheckPhoneResultSchema.parse(await res.json());
+  if (!res.ok || !json.ok) return { ok: false, error: json.error ?? `http_${res.status}` };
+  return { ok: true, blacklisted: json.blacklisted === true };
+}
+
 export async function getOrder(orderId: string): Promise<unknown> {
   const res = await fetch(`${API_BASE}/api/orders/${orderId}`);
   if (!res.ok) return null;

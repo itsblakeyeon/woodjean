@@ -18,6 +18,10 @@ const EnvSchema = z.object({
   // Cron 보호용 (Vercel Cron 헤더)
   CRON_SECRET: z.string().min(1).optional(),
 
+  // Upstash Redis (선택, rate limit)
+  UPSTASH_REDIS_REST_URL: z.string().url().optional(),
+  UPSTASH_REDIS_REST_TOKEN: z.string().min(1).optional(),
+
   // 사이트/봇 URL (Telegram 메시지 링크용)
   PUBLIC_SITE_URL: z.string().url().default("https://woodjean-pangyo.com"),
   PUBLIC_BOT_URL: z.string().url().optional(),

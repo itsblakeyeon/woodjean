@@ -1,4 +1,5 @@
 import * as p from "@clack/prompts";
+import { checkPhone } from "../lib/api";
 import { cancel, ok, type StepResult } from "./draft";
 import type { OrderDraft } from "./draft";
 import type { LastOrder } from "../lib/state";
@@ -42,6 +43,28 @@ export async function collectCustomer(previousLastOrder?: LastOrder): Promise<Cu
     },
   });
   if (p.isCancel(phone)) return null;
+  const cleanedPhone = phone.replace(/\D/g, "");
+
+  const s = p.spinner();
+  let spinnerStopped = false;
+  s.start("휴대폰 주문 가능 여부 확인 중");
+  try {
+    const preflight = await checkPhone(cleanedPhone);
+    if (preflight.ok && preflight.blacklisted) {
+      s.stop("확인 완료");
+      spinnerStopped = true;
+      p.log.error("이 번호로는 주문 접수가 어려워요. 사장님(010-8484-2120)으로 직접 연락 부탁드립니다.");
+      process.exitCode = 4;
+      return null;
+    }
+    if (!preflight.ok && preflight.error !== "rate_limited") {
+      p.log.warn("휴대폰 사전 확인을 완료하지 못했어요. 주문 제출 단계에서 다시 확인할게요.");
+    }
+  } catch {
+    p.log.warn("휴대폰 사전 확인을 완료하지 못했어요. 주문 제출 단계에서 다시 확인할게요.");
+  } finally {
+    if (!spinnerStopped) s.stop("확인 완료");
+  }
 
   const memo = await p.text({
     message: "추가 메모 (200자) — 선택",
@@ -54,7 +77,7 @@ export async function collectCustomer(previousLastOrder?: LastOrder): Promise<Cu
 
   return {
     nickname: nickname.trim(),
-    phone: phone.replace(/\D/g, ""),
+    phone: cleanedPhone,
     memo: memo.trim() || undefined,
   };
 }
