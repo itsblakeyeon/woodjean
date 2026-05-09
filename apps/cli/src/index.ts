@@ -6,6 +6,7 @@ import { CATEGORY_ORDER, formatMenuPrice, stepBuildCart } from "./flow/menu";
 import { stepCollectDelivery } from "./flow/delivery";
 import { stepCollectCustomer } from "./flow/customer";
 import { stepCollectConsent } from "./flow/consent";
+import { runHistory } from "./flow/history";
 import { runRouter } from "./flow/router";
 import { CATEGORY_LABEL, MENU_BY_CATEGORY } from "@woodjean/shared/menu";
 import {
@@ -87,8 +88,9 @@ program
 program
   .command("history")
   .description("이 디바이스의 최근 주문 이력을 보여줘요")
-  .action(() => {
-    p.log.warn("history는 L1 state 구현 후 최근 주문 이력으로 연결돼요.");
+  .action(async () => {
+    const state = await loadState();
+    await handleHistory(state);
   });
 
 const ORDER_STEPS: Step[] = [
@@ -164,17 +166,10 @@ program
         const router = await runRouter(state);
         if (router.action === "cancelled") return cancelOrder(router.reason ?? "주문이 취소됐어요.");
         if (router.action === "history") {
-          p.log.warn("history는 KAI-178에서 최근 주문 이력으로 연결돼요.");
-          return;
+          return handleHistory(state);
         }
         if (router.action === "repeat") {
-          const slotResult = await stepPickSlot(router.draft);
-          if (!slotResult.ok) return cancelOrder(slotResult.reason ?? "주문이 취소됐어요.");
-          let submitStatus = await confirmAndSubmitFromDraft(slotResult.draft);
-          if (submitStatus === "slot_taken") {
-            submitStatus = await retryWithNewSlot(slotResult.draft);
-          }
-          return finishSubmit(submitStatus);
+          return submitRepeatDraft(router.draft);
         }
         return runManualOrder(router.draft);
       }
@@ -197,6 +192,22 @@ async function runManualOrder(initialDraft: OrderDraft): Promise<void> {
   let submitStatus = await confirmAndSubmitFromDraft(draft);
   if (submitStatus === "slot_taken") {
     submitStatus = await retryWithNewSlot(draft);
+  }
+  return finishSubmit(submitStatus);
+}
+
+async function handleHistory(state: Awaited<ReturnType<typeof loadState>>): Promise<void> {
+  const history = await runHistory(state);
+  if (history.action === "cancelled") return cancelOrder(history.reason ?? "주문이 취소됐어요.");
+  if (history.action === "repeat") return submitRepeatDraft(history.draft);
+}
+
+async function submitRepeatDraft(draft: OrderDraft): Promise<void> {
+  const slotResult = await stepPickSlot(draft);
+  if (!slotResult.ok) return cancelOrder(slotResult.reason ?? "주문이 취소됐어요.");
+  let submitStatus = await confirmAndSubmitFromDraft(slotResult.draft);
+  if (submitStatus === "slot_taken") {
+    submitStatus = await retryWithNewSlot(slotResult.draft);
   }
   return finishSubmit(submitStatus);
 }

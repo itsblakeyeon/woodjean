@@ -47,8 +47,16 @@ const StateV1Schema = z.object({
   visitCount: z.number().int().nonnegative().default(0),
 });
 
+const StateV2Schema = z.object({
+  schemaVersion: z.literal(2),
+  lastOrder: LastOrderSchema.optional(),
+  recentOrders: z.array(LastOrderSchema).default([]),
+  recentBuildings: z.array(z.string()).default([]),
+  visitCount: z.number().int().nonnegative().default(0),
+});
+
 export type LastOrder = z.infer<typeof LastOrderSchema>;
-export type WoodjeanState = z.infer<typeof StateV1Schema>;
+export type WoodjeanState = z.infer<typeof StateV2Schema>;
 export type VisitTier = "hot" | "warm" | "cold" | "expired";
 
 export async function ensureDeviceId(): Promise<string> {
@@ -69,8 +77,12 @@ export async function ensureDeviceId(): Promise<string> {
 export async function loadState(): Promise<WoodjeanState | null> {
   try {
     const raw = await readFile(STATE_PATH, "utf8");
-    const parsed = StateV1Schema.safeParse(JSON.parse(raw));
-    return parsed.success ? parsed.data : null;
+    const json = JSON.parse(raw);
+    const v2 = StateV2Schema.safeParse(json);
+    if (v2.success) return v2.data;
+    const v1 = StateV1Schema.safeParse(json);
+    if (!v1.success) return null;
+    return migrateV1ToV2(v1.data);
   } catch {
     return null;
   }
@@ -90,8 +102,9 @@ export async function saveLastOrder(lastOrder: LastOrder): Promise<void> {
   ].slice(0, 10);
 
   await saveState({
-    schemaVersion: 1,
+    schemaVersion: 2,
     lastOrder,
+    recentOrders: [lastOrder, ...(current?.recentOrders ?? []).filter((order) => order.orderId !== lastOrder.orderId)].slice(0, 10),
     recentBuildings,
     visitCount: (current?.visitCount ?? 0) + 1,
   });
@@ -109,4 +122,14 @@ export function getTier(savedAt: string): VisitTier {
 
 export function lastOrderToCart(lastOrder: LastOrder): CartItem[] {
   return lastOrder.cart.map((item) => ({ ...item }));
+}
+
+function migrateV1ToV2(v1: z.infer<typeof StateV1Schema>): WoodjeanState {
+  return {
+    schemaVersion: 2,
+    lastOrder: v1.lastOrder,
+    recentOrders: v1.lastOrder ? [v1.lastOrder] : [],
+    recentBuildings: v1.recentBuildings,
+    visitCount: v1.visitCount,
+  };
 }
