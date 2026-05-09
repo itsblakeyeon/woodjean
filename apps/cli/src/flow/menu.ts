@@ -19,13 +19,13 @@ export type CartItem = OrderItemInput & { displayName: string; subtotal: number 
 export const CATEGORY_ORDER: MenuCategory[] = ["signature", "coffee", "non-coffee"];
 
 export async function stepBuildCart(draft: OrderDraft): Promise<StepResult> {
-  const cart = await buildCart();
+  const cart = await buildCart(draft.cart);
   if (!cart || cart.length === 0) return cancel();
   return ok({ ...draft, cart });
 }
 
-export async function buildCart(): Promise<CartItem[] | null> {
-  const cart: CartItem[] = [];
+export async function buildCart(initialCart: CartItem[] = []): Promise<CartItem[] | null> {
+  const cart: CartItem[] = [...initialCart];
   const startedAt = Date.now();
 
   while (true) {

@@ -7,6 +7,7 @@ import { stepCollectDelivery } from "./flow/delivery";
 import { stepCollectCustomer } from "./flow/customer";
 import { stepCollectConsent } from "./flow/consent";
 import { runHistory } from "./flow/history";
+import { stepPaste } from "./flow/paste";
 import { runRouter } from "./flow/router";
 import { CATEGORY_LABEL, MENU_BY_CATEGORY } from "@woodjean/shared/menu";
 import {
@@ -176,19 +177,28 @@ program
         if (router.action === "repeat") {
           return submitRepeatDraft(router.draft);
         }
-        return runManualOrder(router.draft);
+        return runManualOrder(router.draft, shouldUsePaste(options) ? options : undefined);
       }
 
-      return runManualOrder({});
+      return runManualOrder({}, shouldUsePaste(options) ? options : undefined);
     } catch (e) {
       p.cancel(`오류: ${e instanceof Error ? e.message : String(e)}`);
       process.exitCode = EXIT_NETWORK_FAILURE;
     }
   });
 
-async function runManualOrder(initialDraft: OrderDraft): Promise<void> {
+async function runManualOrder(initialDraft: OrderDraft, pasteOptions?: OrderOptions): Promise<void> {
   let draft: OrderDraft = initialDraft;
-  for (const step of ORDER_STEPS) {
+  const steps: Step[] = pasteOptions
+    ? [
+        stepPickSlot,
+        (draft) => stepPaste(draft, pasteOptions),
+        stepCollectDelivery,
+        stepCollectCustomer,
+        stepCollectConsent,
+      ]
+    : ORDER_STEPS;
+  for (const step of steps) {
     const result = await step(draft);
     if (!result.ok) return cancelOrder(result.reason ?? "주문이 취소됐어요.");
     draft = result.draft;
@@ -219,8 +229,11 @@ async function submitRepeatDraft(draft: OrderDraft): Promise<void> {
 
 function warnForPinnedPlaceholders(options: OrderOptions): void {
   if (options.yes) p.log.warn("--yes는 L1 repeat 구현 후 자동 재제출로 연결돼요. 지금은 수동 확인으로 진행해요.");
-  if (options.paste || options.clipboard) p.log.warn("--paste는 L2 paste 구현 후 자동 인식으로 연결돼요. 지금은 직접 선택으로 진행해요.");
   if (options.json) p.log.warn("--json은 영수증 출력 구현 후 machine-readable 출력으로 연결돼요. 지금은 기본 출력으로 진행해요.");
+}
+
+function shouldUsePaste(options: OrderOptions): boolean {
+  return Boolean(options.paste || options.clipboard || !process.stdin.isTTY);
 }
 
 function cancelOrder(message: string): void {
