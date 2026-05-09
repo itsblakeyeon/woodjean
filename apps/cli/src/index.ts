@@ -45,6 +45,11 @@ const ORDER_STEPS: Step[] = [
   stepCollectConsent,
 ];
 
+// KAI-167 locked copy for upcoming paste surfaces:
+// LLM down: "메뉴 자동 인식이 잠시 멈췄어요. 직접 선택 모드로 넘어갈까요? (또는 --paste 다시 시도)"
+// LLM rate limit: "오늘 자동 인식 사용량 한도에 도달했어요. 직접 선택 모드로 진행해 주세요."
+// LLM price mismatch: "메뉴를 인식했지만 가격이 안 맞아요. 사장님 메뉴와 맞춰서 다시 확인해 주세요."
+
 program
   .command("order", { isDefault: true })
   .description("단체주문을 시작해요")

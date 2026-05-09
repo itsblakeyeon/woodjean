@@ -20,7 +20,7 @@ export async function collectDelivery(): Promise<DeliveryAddress | null> {
 
   const building = await p.text({
     message: "건물명 (예: 유스페이스2 A동)",
-    validate: (v) => (v && v.length > 0 ? undefined : "건물명을 입력해 주세요."),
+    validate: (v) => (v && v.trim().length > 0 ? undefined : "건물명이 필요해요. 예: 유스페이스2 A동, H스퀘어 N동, 알파리움타워"),
   });
   if (p.isCancel(building)) return null;
 
@@ -32,7 +32,7 @@ export async function collectDelivery(): Promise<DeliveryAddress | null> {
 
   const recipient = await p.text({
     message: "수령자 이름",
-    validate: (v) => (v && v.length > 0 ? undefined : "수령자 이름을 입력해 주세요."),
+    validate: (v) => (v && v.trim().length > 0 ? undefined : "수령자 이름이 필요해요. 도착 안내에 사용해요."),
   });
   if (p.isCancel(recipient)) return null;
 

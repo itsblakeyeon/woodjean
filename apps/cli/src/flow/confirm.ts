@@ -168,6 +168,27 @@ export async function confirmAndSubmitPayload(payload: CreateOrderPayload, resto
         ].join("\n"));
         return "slot_taken";
       }
+      if (result.error === "outside_radius") {
+        p.log.error([
+          `${payload.deliveryAddress.building}이(가) 우드진 반경 1km 밖이에요.`,
+          `원인: ${result.message}`,
+          "해결: 다른 건물로 변경하거나 매장(010-8484-2120)으로 문의해 주세요.",
+          `주문 정보는 ${DRAFT_PATH}에 저장됐어요.`,
+        ].join("\n"));
+        return "server_rejected";
+      }
+      if (result.error === "blacklisted") {
+        p.log.error("이 번호로는 주문 접수가 어려워요. 사장님(010-8484-2120)으로 직접 연락 부탁드립니다.");
+        return "server_rejected";
+      }
+      if (result.error === "outside_hours" || result.error === "paused") {
+        p.log.error([
+          "지금은 주문 접수 시간이 아니에요.",
+          `원인: ${result.message}`,
+          "해결: 다음 가능 시간을 다시 선택해 주세요. 알림은 매장으로 카카오 부탁드려요.",
+        ].join("\n"));
+        return "server_rejected";
+      }
       p.log.error([
         "서버가 주문 접수를 거절했어요.",
         `원인: [${result.error}] ${result.message}`,

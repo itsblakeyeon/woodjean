@@ -55,7 +55,7 @@ export async function buildCart(): Promise<CartItem[] | null> {
 
     // add
     if (cart.length >= 30) {
-      p.log.warn("최대 30잔까지 주문 가능해요.");
+      p.log.warn("최대 30잔까지 주문 가능해요. 30잔이 넘으면 한 번 더 시키시는 걸 추천드려요!");
       continue;
     }
     const items = await pickItems(30 - cart.length);
@@ -208,8 +208,8 @@ async function pickQuantity(menuName: string, maxQuantity: number): Promise<numb
     placeholder: "예: 2",
     validate: (v) => {
       const n = Number(v);
-      if (!Number.isInteger(n) || n < 1) return "1~30 사이의 정수로 입력해 주세요.";
-      if (n > maxQuantity) return `최대 ${maxQuantity}잔까지 더 추가할 수 있어요.`;
+      if (!Number.isInteger(n) || n < 1) return "1잔 이상 정수로 입력해 주세요.";
+      if (n > maxQuantity) return `최대 30잔까지 주문 가능해요. 지금은 ${maxQuantity}잔까지만 더 추가할 수 있어요.`;
       return undefined;
     },
   });
