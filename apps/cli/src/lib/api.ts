@@ -89,51 +89,6 @@ export async function registerNotify(
   return { ok: true, expiresAt: json.expiresAt ?? "" };
 }
 
-export type ParsedCartItem = {
-  menuSlug: string;
-  qty: number;
-  size: "R" | "L";
-  temp: "ICE" | "HOT";
-  variant?: string | null;
-  options: { shot?: boolean; milkChange?: boolean; decaf?: boolean };
-  subtotal: number;
-};
-
-const ParseCartResultSchema = z.discriminatedUnion("ok", [
-  z.object({
-    ok: z.literal(true),
-    items: z.array(z.object({
-      menuSlug: z.string(),
-      qty: z.number().int(),
-      size: z.enum(["R", "L"]),
-      temp: z.enum(["ICE", "HOT"]),
-      variant: z.string().nullable().optional(),
-      options: z.object({
-        shot: z.boolean().optional(),
-        milkChange: z.boolean().optional(),
-        decaf: z.boolean().optional(),
-      }),
-      subtotal: z.number().int(),
-    })),
-    unresolved: z.array(z.string()),
-    confidence: z.number(),
-  }),
-  z.object({
-    ok: z.literal(false),
-    error: z.enum(["rate_limited", "llm_unavailable", "validation"]),
-  }),
-]);
-
-export async function parseCart(text: string): Promise<z.infer<typeof ParseCartResultSchema>> {
-  const deviceHint = await getDeviceIdHash();
-  const res = await fetch(`${API_BASE}/api/parse-cart`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ text, deviceHint }),
-  });
-  return ParseCartResultSchema.parse(await res.json());
-}
-
 export async function getOrder(orderId: string): Promise<unknown> {
   const res = await fetch(`${API_BASE}/api/orders/${orderId}`);
   if (!res.ok) return null;
