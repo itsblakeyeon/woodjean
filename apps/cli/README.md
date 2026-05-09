@@ -18,7 +18,6 @@ npx woodjean order
 ```bash
 npx woodjean order
 npx woodjean order --new
-pbpaste | npx woodjean order --paste
 npx woodjean menu
 npx woodjean history
 ```
@@ -27,9 +26,8 @@ npx woodjean history
 | --- | --- |
 | `--yes`, `-y` | 같은 주문 재제출용 non-interactive 모드 |
 | `--new` | 저장된 단골 정보를 건너뛰고 새 주문 시작 |
-| `--paste` | stdin 또는 `@file.txt` 메뉴 목록 자동 인식 |
-| `--paste --clipboard` | 클립보드 메뉴 목록 자동 인식 |
 | `--no-splash` | 시작 배너 생략 |
+| `--brand` | 방문 횟수와 무관하게 풀 브랜드 배너 출력 |
 | `--json` | machine-readable 영수증 출력 |
 | `--debug` | API 호출 디버그 로그 출력. 휴대폰은 마스킹 |
 
@@ -57,13 +55,10 @@ WOODJEAN
 ## 흐름
 
 ```text
-L1 repeat       ~/.woodjean/state.json
+단골 (L1)        ~/.woodjean/state.json — 같은 메뉴/배달지 1-step 재주문
      │
      ▼
-L2 paste        Slack/Kakao list -> parse-cart
-     │
-     ▼
-L3 manual       slot -> cart -> delivery -> customer -> consent -> confirm
+신규/재구성 (L3)  slot -> cart -> delivery -> customer -> consent -> confirm
 ```
 
 1. 도착 시간 선택: 평일 영업시간과 1시간 lead time 적용. 시간당 1건만 접수해요.
@@ -124,8 +119,7 @@ v1.1에서는 고객용 취소 API가 없어요. 매장(010-8484-2120)으로 직
 ## Links
 
 - GitHub: https://github.com/itsblakeyeon/woodjean
-- v1.0.2 changes: https://github.com/itsblakeyeon/woodjean/commit/3a2ef57
-- v1.1 work: https://github.com/itsblakeyeon/woodjean/commits/main
+- Changelog: [CHANGELOG.md](./CHANGELOG.md)
 
 ## 라이선스
 
