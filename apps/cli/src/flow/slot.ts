@@ -29,13 +29,32 @@ export async function pickSlot(): Promise<Slot | null> {
     byDay.set(day, arr);
   }
 
+  const day = await p.select<string>({
+    message: "도착 날짜를 선택해 주세요",
+    options: [...byDay.entries()].map(([day, slots]) => ({
+      value: day,
+      label: formatDayLabel(day),
+      hint: `${slots.length}개 슬롯`,
+    })),
+  });
+  if (p.isCancel(day)) return null;
+
+  const daySlots = byDay.get(day) ?? [];
   const choice = await p.select<string>({
     message: "도착 시간을 선택해 주세요 (lead time 1시간)",
-    options: slots.map((s) => ({
+    options: daySlots.map((s) => ({
       value: s.deliveryAt,
       label: formatKstWindow(s.deliveryAt),
     })),
   });
   if (p.isCancel(choice)) return null;
-  return slots.find((s) => s.deliveryAt === choice) ?? null;
+  return daySlots.find((s) => s.deliveryAt === choice) ?? null;
+}
+
+function formatDayLabel(day: string): string {
+  const d = new Date(`${day}T00:00:00+09:00`);
+  const month = d.getMonth() + 1;
+  const date = d.getDate();
+  const dayOfWeek = ["일", "월", "화", "수", "목", "금", "토"][d.getDay()];
+  return `${month}/${date} (${dayOfWeek})`;
 }
