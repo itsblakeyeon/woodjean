@@ -62,18 +62,7 @@ export async function runRouter(state: WoodjeanState | null): Promise<RouterResu
 }
 
 async function runColdRouter(): Promise<RouterResult> {
-  const choice = await p.select<"manual" | "paste">({
-    message: "처음 방문해주셔서 감사합니다.",
-    options: [
-      { value: "manual", label: "직접 선택 (메뉴에서 하나씩)" },
-      { value: "paste", label: "카톡/슬랙 list 붙여넣기 (--paste 준비 중)" },
-    ],
-    initialValue: "manual",
-  });
-  if (p.isCancel(choice)) return { action: "cancelled" };
-  if (choice === "paste") {
-    p.log.warn("--paste는 L2 paste 구현 후 자동 인식으로 연결돼요. 지금은 직접 선택으로 진행해요.");
-  }
+  p.log.info("처음 방문해주셔서 감사해요. 메뉴에서 하나씩 골라드릴게요.");
   return { action: "manual", draft: {} };
 }
 

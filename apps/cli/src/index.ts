@@ -29,8 +29,6 @@ const EXIT_SERVER_REJECTION = 6;
 type OrderOptions = {
   yes?: boolean;
   new?: boolean;
-  paste?: string | boolean;
-  clipboard?: boolean;
   noSplash?: boolean;
   brand?: boolean;
   json?: boolean;
@@ -47,7 +45,6 @@ program
 Examples:
   $ npx woodjean order
   $ npx woodjean order --new
-  $ pbpaste | npx woodjean order --paste
   $ npx woodjean menu
   $ npx woodjean history
 
@@ -102,18 +99,11 @@ const ORDER_STEPS: Step[] = [
   stepCollectConsent,
 ];
 
-// KAI-167 locked copy for upcoming paste surfaces:
-// LLM down: "메뉴 자동 인식이 잠시 멈췄어요. 직접 선택 모드로 넘어갈까요? (또는 --paste 다시 시도)"
-// LLM rate limit: "오늘 자동 인식 사용량 한도에 도달했어요. 직접 선택 모드로 진행해 주세요."
-// LLM price mismatch: "메뉴를 인식했지만 가격이 안 맞아요. 사장님 메뉴와 맞춰서 다시 확인해 주세요."
-
 program
   .command("order", { isDefault: true })
   .description("단체주문을 시작해요")
   .option("-y, --yes", "non-interactive로 같은 주문을 재제출해요 (L1 repeat 준비)")
   .option("--new", "저장된 단골 정보를 건너뛰고 새 주문으로 시작해요")
-  .option("--paste [source]", "붙여넣은 메뉴 목록을 자동 인식해요. @file.txt 또는 stdin 지원 예정")
-  .option("--clipboard", "--paste와 함께 클립보드 내용을 사용해요")
   .option("--no-splash", "시작 배너를 생략해요")
   .option("--brand", "방문 횟수와 무관하게 풀 브랜드 배너를 보여줘요")
   .option("--json", "machine-readable 영수증을 출력해요")
@@ -219,7 +209,6 @@ async function submitRepeatDraft(draft: OrderDraft): Promise<void> {
 
 function warnForPinnedPlaceholders(options: OrderOptions): void {
   if (options.yes) p.log.warn("--yes는 L1 repeat 구현 후 자동 재제출로 연결돼요. 지금은 수동 확인으로 진행해요.");
-  if (options.paste || options.clipboard) p.log.warn("--paste는 L2 paste 구현 후 자동 인식으로 연결돼요. 지금은 직접 선택으로 진행해요.");
   if (options.json) p.log.warn("--json은 영수증 출력 구현 후 machine-readable 출력으로 연결돼요. 지금은 기본 출력으로 진행해요.");
 }
 
