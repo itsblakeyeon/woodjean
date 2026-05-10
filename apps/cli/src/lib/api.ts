@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { getDeviceIdHash } from "./telemetry";
 
-const API_BASE = process.env.WOODJEAN_API_URL ?? "https://bot.woodjean-pangyo.com";
+const API_BASE = process.env.WOODJEAN_API_URL ?? "https://cli.woodjean-pangyo.com";
 
 const SlotSchema = z.object({
   deliveryAt: z.string(),

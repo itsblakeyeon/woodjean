@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { ensureDeviceId, getTier, type WoodjeanState } from "./state";
 
-const API_BASE = process.env.WOODJEAN_API_URL ?? "https://bot.woodjean-pangyo.com";
+const API_BASE = process.env.WOODJEAN_API_URL ?? "https://cli.woodjean-pangyo.com";
 
 export async function emitEvent(event: string, payload: Record<string, unknown> = {}): Promise<void> {
   if (process.env.WOODJEAN_TELEMETRY_OFF === "1") return;

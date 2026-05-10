@@ -23,7 +23,7 @@ supabase/
 - **Solapi SMS**: API key + secret + 발신번호 등록 (통신증명원 + 사업자등록증)
 - **Vercel 프로젝트** 2개:
   - `woodjean-site` — 이미 라이브 (woodjean-pangyo.com)
-  - `woodjean-bot` — 신규 배포 필요 (bot.woodjean-pangyo.com 등)
+  - `woodjean-bot` — apps/bot 코드 호스팅 (`bot.woodjean-pangyo.com` + `cli.woodjean-pangyo.com` 둘 다 매핑)
 - **도메인** (가비아 → Vercel NS 위임 완료)
 - **Sentry** (선택): DSN
 - **Upstash Redis** (선택, v1.1): rate limiting
@@ -52,7 +52,7 @@ vercel --prod
 배포 후 Telegram webhook 등록:
 
 ```bash
-curl "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/setWebhook?url=https://bot.woodjean-pangyo.com/api/telegram/webhook&secret_token=$TELEGRAM_WEBHOOK_SECRET"
+curl "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/setWebhook?url=https://cli.woodjean-pangyo.com/api/telegram/webhook&secret_token=$TELEGRAM_WEBHOOK_SECRET"
 ```
 
 봇과 1:1 대화에서 `/시작` 입력 → 안내 메시지가 오면 정상.
