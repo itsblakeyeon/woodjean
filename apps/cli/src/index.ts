@@ -31,7 +31,6 @@ type OrderOptions = {
   new?: boolean;
   noSplash?: boolean;
   brand?: boolean;
-  json?: boolean;
   debug?: boolean;
 };
 
@@ -106,7 +105,6 @@ program
   .option("--new", "저장된 단골 정보를 건너뛰고 새 주문으로 시작해요")
   .option("--no-splash", "시작 배너를 생략해요")
   .option("--brand", "방문 횟수와 무관하게 풀 브랜드 배너를 보여줘요")
-  .option("--json", "machine-readable 영수증을 출력해요")
   .option("--debug", "verbose API 호출 로그를 켜요 (휴대폰 마스킹)")
   .action(async (options: OrderOptions) => {
     if (options.debug) process.env.WOODJEAN_DEBUG = "1";
@@ -209,7 +207,6 @@ async function submitRepeatDraft(draft: OrderDraft): Promise<void> {
 
 function warnForPinnedPlaceholders(options: OrderOptions): void {
   if (options.yes) p.log.warn("--yes는 L1 repeat 구현 후 자동 재제출로 연결돼요. 지금은 수동 확인으로 진행해요.");
-  if (options.json) p.log.warn("--json은 영수증 출력 구현 후 machine-readable 출력으로 연결돼요. 지금은 기본 출력으로 진행해요.");
 }
 
 function cancelOrder(message: string): void {

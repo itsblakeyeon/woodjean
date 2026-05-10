@@ -1,5 +1,21 @@
 # woodjean CLI changelog
 
+## 1.2.0 (2026-05-10)
+
+후불 컨텍스트 정리 — 영수증 surface 제거 + 사용 안 되는 flag 제거.
+
+### 제거
+
+- 영수증 페이지 + QR 출력. 후불(현장 결제)에선 영수증이 결제 증빙이 아니고, `apps/site/order/[id]` 라우트가 미구현이라 모든 영수증 QR이 404로 backfire였어요. CLI는 주문 ID와 도착 시간만 success 메시지로 노출해요.
+- `--json` flag. 영수증 출력 placeholder였고 호출 시 warn만 출력했어요. KAI-166 PIN 표면이라 시맨틱상 breaking이지만 사용자 노출 0이라 영향 거의 없음.
+- `qrcode-terminal` 디펜던시. 번들 −15 KB (279.9 → 264.5 KB).
+
+### 추가
+
+- `pnpm -F woodjean qa-demo` dev 스크립트 — splash·박스·emoji·dim 한 화면 출력 (KAI-173 시각 sanity).
+- README "터미널 호환성" 섹션 + Windows untested disclaimer.
+- `docs/qa/kai-173-matrix.md` 매트릭스 템플릿.
+
 ## 1.1.0 (2026-05-09)
 
 단골 retention 릴리스. v1.0.2 hotfix 위에 신규 명령, 단골 prefill, 슬롯/배달 UX 개선을 얹었어요.

@@ -2,7 +2,6 @@ import { chmod, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import * as p from "@clack/prompts";
-import qrcode from "qrcode-terminal";
 import stringWidth from "string-width";
 import { priceItem } from "@woodjean/shared/pricing";
 import { createOrder, type CreateOrderPayload } from "../lib/api";
@@ -233,21 +232,13 @@ export async function confirmAndSubmitPayload(payload: CreateOrderPayload, resto
       usedL2: false,
     });
 
-    // 영수증
-    const recvUrl = `https://woodjean-pangyo.com/order/${result.orderId}`;
     console.log("");
     p.log.success([
       "✅  주문이 접수됐어요.",
       `   주문 ID: ${result.orderId}`,
       `   ${formatKstWindow(result.deliveryAt)} 도착 예정`,
       `   ${result.cupCount}잔 · ${formatPrice(result.totalAmount)} (현장 후불)`,
-      "",
-      `   영수증: ${recvUrl}`,
     ].join("\n"));
-
-    console.log("");
-    console.log("\x1b[2m  QR로 영수증 열기:\x1b[0m");
-    qrcode.generate(recvUrl, { small: true });
     return "submitted";
   }
 }
@@ -289,7 +280,7 @@ function formatKstInstant(iso: string): string {
   return `${month}/${day}(${dayOfWeek}) ${hh}:${mm}`;
 }
 
-function formatSummaryBox(lines: string[]): string {
+export function formatSummaryBox(lines: string[]): string {
   const cols = Math.max(36, Math.min(process.stdout.columns ?? 80, 80) - 2);
   const width = Math.min(cols, MAX_SUMMARY_WIDTH);
   const rule = "━".repeat(width);

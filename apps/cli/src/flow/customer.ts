@@ -18,10 +18,10 @@ export async function stepCollectCustomer(draft: OrderDraft): Promise<StepResult
 
 export async function collectCustomer(previousLastOrder?: LastOrder): Promise<Customer | null> {
   const nickname = await p.text({
-    message: "닉네임 (사장님이 영수증/메시지에 사용)",
+    message: "닉네임 (사장님이 메시지/SMS에 사용)",
     initialValue: previousLastOrder?.nickname,
     validate: (v) => {
-      if (!v || v.trim().length === 0) return "닉네임이 필요해요. 사장님이 영수증·SMS에 사용해요.";
+      if (!v || v.trim().length === 0) return "닉네임이 필요해요. 사장님이 SMS·메시지에 사용해요.";
       if (v.length > 20) return `닉네임은 20자까지 가능해요 (현재 ${v.length}자).`;
       return undefined;
     },

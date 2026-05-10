@@ -26,7 +26,7 @@ export async function runRouter(state: WoodjeanState | null): Promise<RouterResu
       options: [
         { value: "repeat", label: "같은 걸로 — 시간만 새로 고를게요" },
         { value: "new", label: "이번엔 다르게 — 처음부터" },
-        { value: "history", label: "영수증/이력 보기" },
+        { value: "history", label: "주문 이력 보기" },
       ],
       initialValue: "repeat",
     });

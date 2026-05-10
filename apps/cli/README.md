@@ -28,7 +28,6 @@ npx woodjean history
 | `--new` | 저장된 단골 정보를 건너뛰고 새 주문 시작 |
 | `--no-splash` | 시작 배너 생략 |
 | `--brand` | 방문 횟수와 무관하게 풀 브랜드 배너 출력 |
-| `--json` | machine-readable 영수증 출력 |
 | `--debug` | API 호출 디버그 로그 출력. 휴대폰은 마스킹 |
 
 ## 첫 주문 예시
@@ -43,13 +42,12 @@ WOODJEAN
 ◇  도착 시간을 선택해 주세요 (lead time 1시간)
 ◇  다음 작업을 선택해 주세요
 ◇  건물명 (예: 유스페이스2 A동)
-◇  닉네임 (사장님이 영수증/메시지에 사용)
+◇  닉네임 (사장님이 메시지/SMS에 사용)
 ◇  위 내용에 모두 동의하시나요?
 
 ✅  주문이 접수됐어요.
    주문 ID: ord_xxxxxxxxxxxxxxxx
    5잔 · 23,000원 (현장 후불)
-   영수증: https://woodjean-pangyo.com/order/ord_xxxxxxxxxxxxxxxx
 ```
 
 ## 흐름
@@ -75,6 +73,14 @@ WOODJEAN
 - 매장 전화: 010-8484-2120
 - 사이트: https://woodjean-pangyo.com
 - 결제: 후불. 배달 시 카드, 송금, 이체 가능
+
+## 터미널 호환성
+
+ANSI 256색 + UTF-8 emoji를 지원하는 macOS 터미널(Apple Terminal, iTerm2, Warp, Alacritty, Ghostty 등)에서 동작해요. blake 환경에서 splash·박스·emoji·dim·QR 출력을 sanity 검증했어요.
+
+**Windows Terminal**: untested. Node.js + cross-platform 디펜던시로 동작 가능성은 높지만 시각 출력은 검증되지 않았어요. 깨짐 발견 시 [GitHub issues](https://github.com/itsblakeyeon/woodjean/issues)에 제보 부탁드려요.
+
+내 터미널에서 직접 시각 출력을 확인하고 싶으면 `pnpm -F woodjean qa-demo`(repo 클론 후) 또는 `npx woodjean order`로 실제 흐름을 돌려 보세요.
 
 ## Troubleshooting
 

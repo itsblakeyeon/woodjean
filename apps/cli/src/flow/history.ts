@@ -26,7 +26,6 @@ export async function runHistory(state: WoodjeanState | null): Promise<HistoryRe
       ...orders.map((order) => ({
         value: order.orderId,
         label: formatHistoryRow(order),
-        hint: `영수증: https://woodjean-pangyo.com/order/${order.orderId}`,
       })),
       { value: "back", label: "← 뒤로" },
     ],
