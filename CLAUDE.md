@@ -98,6 +98,27 @@ supabase/
 - `woodjean menu` / `status` / `history` 명령어
 - 빌링키 (별도 가맹 심사 필요)
 
+## CLI 분리 후 운영 룰 (2026-05-10 Public Launch)
+
+CLI는 별도 public repo로 분리됨: https://github.com/itsblakeyeon/woodjean-cli (npm: `woodjean@1.2.1`).
+
+**source of truth**:
+- **CLI 코드 = `itsblakeyeon/woodjean-cli` repo만** (이 monorepo `apps/cli/`는 stale, 7-14일 안정 운영 후 Phase 8 삭제 예정)
+- **메뉴/가격 코드 = monorepo `packages/shared/`만** (backend `apps/bot`, `apps/site`가 workspace로 사용)
+- **CLI는 `src/shared/`에 inline 복사본 보유** (외부 npm 의존 회피, self-contained)
+
+**메뉴/가격 변경 절차** (drift 방지):
+1. 이 monorepo `packages/shared/src/menu/data.ts` 또는 `pricing/calculate.ts` 수정
+2. backend가 자동 반영 (workspace:*)
+3. **cli repo `src/shared/`에 동일 변경 manual 복사** (`itsblakeyeon/woodjean-cli`에서 작업)
+4. cli repo에서 patch version bump + npm publish
+
+→ 변경 빈도가 낮아서(메뉴는 거의 fix) 수동 sync 운영. 변경 시 두 repo 모두 commit하지 않으면 cli 사용자가 stale 가격 보게 됨.
+
+**Phase 8 monorepo cleanup** (2026-05-17 ~ 2026-05-24 사이 예정):
+- `apps/cli/` 디렉토리 + 관련 workspace 항목 삭제
+- 단 `packages/shared/`는 backend 의존이라 유지
+
 ## 작업 시작 시 참고
 
 새 세션에서 이 프로젝트 코드 작업할 때:
