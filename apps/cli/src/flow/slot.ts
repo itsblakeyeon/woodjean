@@ -16,7 +16,7 @@ export async function pickSlot(): Promise<Slot | null> {
   s.start("주문 가능한 시간 조회 중");
   let slots: Slot[];
   try {
-    slots = await listSlots(3);
+    slots = await listSlots(7);
   } catch (e) {
     s.stop("시간 조회 실패");
     p.log.error(e instanceof Error ? e.message : String(e));
