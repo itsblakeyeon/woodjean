@@ -98,27 +98,26 @@ supabase/
 - `woodjean menu` / `status` / `history` 명령어
 - 빌링키 (별도 가맹 심사 필요)
 
-## CLI 분리 후 운영 룰 (2026-05-10 Public Launch)
+## CLI 운영 룰 (2026-05-15 monorepo 재통합 — `c3ff480`)
 
-CLI는 별도 public repo로 분리됨: https://github.com/itsblakeyeon/woodjean-cli (npm: `woodjean@1.2.1`).
+CLI는 이 monorepo `apps/cli/` 단일 소스로 운영. (npm: `woodjean@latest`, publisher `itsblakeyeon`)
 
-**source of truth**:
-- **CLI 코드 = `itsblakeyeon/woodjean-cli` repo만** (이 monorepo `apps/cli/`는 2026-05-15 Phase 8에서 삭제 완료)
-- **메뉴/가격 코드 = monorepo `packages/shared/`만** (backend `apps/bot`, `apps/site`가 workspace로 사용)
-- **CLI는 `src/shared/`에 inline 복사본 보유** (외부 npm 의존 회피, self-contained)
+> **이력**: 2026-05-10 한때 별도 public repo `itsblakeyeon/woodjean-cli` + `src/shared/` 수동 복사본으로 분리 운영했으나, 2 repo 운영 부담(CHANGELOG/release/dashboard 이중화) 회수를 위해 2026-05-15 `c3ff480`에서 monorepo로 재통합. 옛 public repo는 삭제됨. (이전 "Phase 8 apps/cli 삭제"는 같은 날 `c3ff480`로 되돌려짐 — 더 이상 유효하지 않음)
 
-**메뉴/가격 변경 절차** (drift 방지):
-1. 이 monorepo `packages/shared/src/menu/data.ts` 또는 `pricing/calculate.ts` 수정
-2. backend가 자동 반영 (workspace:*)
-3. **cli repo `src/shared/`에 동일 변경 manual 복사** (`itsblakeyeon/woodjean-cli`에서 작업)
-4. cli repo에서 patch version bump + npm publish
+**source of truth (단일화됨)**:
+- **CLI 코드 = monorepo `apps/cli/`만** (별도 cli repo 없음, `src/shared/` inline 복사본 없음)
+- **메뉴/가격 코드 = monorepo `packages/shared/`만**
+- CLI는 `@woodjean/shared/menu`·`@woodjean/shared/pricing`을 **workspace dep로 직접 import**. esbuild(`build.mjs`)가 publish 시 inline 번들 → 배포 tarball은 self-contained (`dependencies: {}`).
 
-→ 변경 빈도가 낮아서(메뉴는 거의 fix) 수동 sync 운영. 변경 시 두 repo 모두 commit하지 않으면 cli 사용자가 stale 가격 보게 됨.
+**메뉴/가격 변경 절차** (drift 없음 — 단일 소스):
+1. `packages/shared/src/menu/data.ts` 또는 `pricing/calculate.ts` 수정
+2. backend(`apps/bot`/`apps/site`) + CLI 모두 workspace로 자동 반영 (수동 복사 불필요)
+3. `apps/cli/package.json` version bump + CHANGELOG 추가 → `apps/cli`에서 `npm publish` (OTP 2FA 필요 — 사용자 위임)
 
-**Phase 8 monorepo cleanup** (2026-05-15 완료):
-- `apps/cli/` 디렉토리 삭제 완료
-- `pnpm-workspace.yaml`은 `apps/*` 와일드카드라 자동 반영, root scripts 수정 불필요
-- `packages/shared/`는 backend 의존이라 유지
+**배포 경로**:
+- `apps/site` → Vercel `itsblakeyeon/woodjean-web` (woodjean-pangyo.com), git push 자동배포
+- `apps/bot` → Vercel `itsblakeyeon/woodjean-bot` (bot.woodjean-pangyo.com), git push 자동배포
+- `apps/cli` → npm `woodjean` (push 자동 아님 — `npm publish` 수동, OTP 위임)
 
 ## 작업 시작 시 참고
 
