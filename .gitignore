@@ -50,3 +50,9 @@ coverage/
 
 # CLI README는 루트 README.md의 빌드 사본 (build.mjs가 동기화)
 apps/cli/README.md
+
+# Private — public repo 미노출 (2026-05-15 분리)
+CLAUDE.local.md
+AGENTS.md
+docs/legal/
+woodjean-internal-backup-*/
