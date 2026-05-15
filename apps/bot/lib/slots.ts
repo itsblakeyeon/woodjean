@@ -126,7 +126,10 @@ export async function listAvailableSlots(opts?: { now?: Date; days?: number }): 
       const winStart = kstToUtc(k.year, k.month, k.day, sH, sM);
       const winEnd = kstToUtc(k.year, k.month, k.day, eH, eM);
 
-      for (let t = winStart.getTime(); t + SLOT_MS <= winEnd.getTime() + 1; t += SLOT_MS) {
+      // SLOT_MS(=1h) 정각 boundary로 round-up — validateDeliverySlot의 hour-aligned 정책과 일치시킴
+      // (예: 영업 13:30 시작이면 첫 슬롯 14:00. KST_OFFSET=9h가 1h 정수배라 UTC 정각=KST 정각)
+      const firstSlot = Math.ceil(winStart.getTime() / SLOT_MS) * SLOT_MS;
+      for (let t = firstSlot; t + SLOT_MS <= winEnd.getTime() + 1; t += SLOT_MS) {
         const slotStart = new Date(t);
         const reasons: Slot["reason"][] = [];
 
