@@ -1,6 +1,6 @@
 {
   "name": "woodjean",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "우드진 판교점 단체주문 CLI — 회의용 음료 5~30잔 예약 배달",
   "license": "MIT",
   "author": "Blake Yeon",
@@ -16,14 +16,13 @@
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "node build.mjs"
   },
-  "//": "all runtime deps are bundled into dist/cli.mjs by esbuild — listed under devDependencies so npm install does not re-fetch them at user install time",
-  "dependencies": {
-    "@woodjean/shared": "workspace:*"
-  },
+  "//": "all runtime deps are bundled into dist/cli.mjs by esbuild — listed under devDependencies so npm install does not re-fetch them at user install time. @woodjean/shared is also devDependency because esbuild inlines it; the published package is fully self-contained.",
+  "dependencies": {},
   "devDependencies": {
     "@clack/prompts": "^0.9.0",
     "@types/figlet": "^1.7.0",
     "@types/node": "^22.10.2",
+    "@woodjean/shared": "workspace:*",
     "commander": "^12.1.0",
     "esbuild": "^0.24.0",
     "figlet": "^1.8.0",
@@ -40,14 +39,6 @@
   "keywords": ["woodjean", "coffee", "pangyo", "group-order", "cli"],
   "engines": {
     "node": ">=18"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/itsblakeyeon/woodjean-cli.git"
-  },
-  "homepage": "https://github.com/itsblakeyeon/woodjean-cli#readme",
-  "bugs": {
-    "url": "https://github.com/itsblakeyeon/woodjean-cli/issues"
   },
   "pnpm": {
     "onlyBuiltDependencies": ["esbuild"]

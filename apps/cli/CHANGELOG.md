@@ -1,5 +1,12 @@
 # woodjean CLI changelog
 
+## 1.2.5 (2026-05-15)
+
+woodjean CLI를 다시 monorepo로 통합. 2 repo 운영 부담(CHANGELOG/release/dashboard 둘) 회수가 목적. npm 패키지로서 동작은 v1.2.4와 동일 (영업 흐름·옵션·뒤로가기 등 다 그대로), 메타데이터만 정리.
+
+- `repository` / `homepage` / `bugs` 필드 제거 — 옛 `itsblakeyeon/woodjean-cli` 공개 repo는 삭제됐고 monorepo는 private이라 외부에서 따라갈 link가 없어졌어요. issues/PR이 필요하면 매장 010-8484-2120 또는 메일로.
+- `@woodjean/shared` workspace dep로 redirect — esbuild가 inline bundle해서 사용자 install 시 추가 의존성 0 (published tarball은 fully self-contained).
+
 ## 1.2.4 (2026-05-15)
 
 메뉴 선택 흐름에 명시적 `← 뒤로` 추가. 그동안 메뉴/가격/옵션을 확인해보려면 일단 카트까지 추가하고 다시 삭제해야 했는데, 이제 카테고리/메뉴/사이즈/온도/옵션/잔수 각 단계마다 `← 뒤로 (XXX로)` 옵션이 보여서 어디로 돌아가는지도 명확. 메뉴마다 단계가 다르게 skip되는 것도 똑같이 따라가요. Ctrl+C 단번에 빠지는 동작은 그대로 유지.
