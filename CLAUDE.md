@@ -103,7 +103,7 @@ supabase/
 CLI는 별도 public repo로 분리됨: https://github.com/itsblakeyeon/woodjean-cli (npm: `woodjean@1.2.1`).
 
 **source of truth**:
-- **CLI 코드 = `itsblakeyeon/woodjean-cli` repo만** (이 monorepo `apps/cli/`는 stale, 7-14일 안정 운영 후 Phase 8 삭제 예정)
+- **CLI 코드 = `itsblakeyeon/woodjean-cli` repo만** (이 monorepo `apps/cli/`는 2026-05-15 Phase 8에서 삭제 완료)
 - **메뉴/가격 코드 = monorepo `packages/shared/`만** (backend `apps/bot`, `apps/site`가 workspace로 사용)
 - **CLI는 `src/shared/`에 inline 복사본 보유** (외부 npm 의존 회피, self-contained)
 
@@ -115,9 +115,10 @@ CLI는 별도 public repo로 분리됨: https://github.com/itsblakeyeon/woodjean
 
 → 변경 빈도가 낮아서(메뉴는 거의 fix) 수동 sync 운영. 변경 시 두 repo 모두 commit하지 않으면 cli 사용자가 stale 가격 보게 됨.
 
-**Phase 8 monorepo cleanup** (2026-05-17 ~ 2026-05-24 사이 예정):
-- `apps/cli/` 디렉토리 + 관련 workspace 항목 삭제
-- 단 `packages/shared/`는 backend 의존이라 유지
+**Phase 8 monorepo cleanup** (2026-05-15 완료):
+- `apps/cli/` 디렉토리 삭제 완료
+- `pnpm-workspace.yaml`은 `apps/*` 와일드카드라 자동 반영, root scripts 수정 불필요
+- `packages/shared/`는 backend 의존이라 유지
 
 ## 작업 시작 시 참고
 

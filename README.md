@@ -6,7 +6,6 @@
 
 ```
 apps/
-  cli/      # ink/clack 기반 CLI, npm publish 대상 (name: "woodjean")
   bot/      # Next.js 백엔드 (주문 API + Telegram webhook + Cron)
   site/     # 마케팅 사이트 (https://woodjean-pangyo.com)
 packages/
@@ -15,6 +14,8 @@ supabase/
   migrations/   # 0001_init.sql — 7 테이블
   seed/         # menu.sql — 27 음료 + 4 옵션 + 7 settings
 ```
+
+> CLI는 별도 public repo: [itsblakeyeon/woodjean-cli](https://github.com/itsblakeyeon/woodjean-cli) (npm: `woodjean`).
 
 ## 외부 의존성 (사용자 셋업 필요)
 
@@ -59,13 +60,7 @@ curl "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/setWebhook?url=https://cli
 
 ### 3. CLI 빌드 + npm publish
 
-```bash
-cd apps/cli
-pnpm build
-node dist/cli.mjs --version   # 동작 확인
-# 첫 publish (npm 로그인 필요)
-npm publish
-```
+CLI는 별도 repo에서 작업: [itsblakeyeon/woodjean-cli](https://github.com/itsblakeyeon/woodjean-cli).
 
 ## 개발
 
@@ -74,12 +69,11 @@ pnpm install
 # bot dev (port 3001)
 cd apps/bot && pnpm dev
 
-# CLI dev (별도 터미널)
-cd apps/cli && WOODJEAN_API_URL=http://localhost:3001 pnpm dev order
-
 # site dev (port 3000)
 cd apps/site && pnpm dev
 ```
+
+CLI 개발은 `woodjean-cli` repo 참조.
 
 ## 비즈니스 룰 (4/29 Ultra-Lean 확정)
 
