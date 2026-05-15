@@ -261,6 +261,15 @@ function formatKstWindow(d: Date): string {
   return `${month}/${day} ${h}:${m}`;
 }
 
+// 사장님 알림용 — raw digits를 010-XXXX-XXXX로. 마스킹 아님(신뢰 경계 내부),
+// 확인 콜 위해 읽기/탭 편의 (KAI-244, 2026-05-15).
+function formatPhoneForOwner(raw: string): string {
+  const d = raw.replace(/\D/g, "");
+  if (/^01\d{9}$/.test(d)) return `${d.slice(0, 3)}-${d.slice(3, 7)}-${d.slice(7)}`;
+  if (/^01\d{8}$/.test(d)) return `${d.slice(0, 3)}-${d.slice(3, 6)}-${d.slice(6)}`;
+  return raw;
+}
+
 function summarizeItems(items: OrderItemPriced[]): string {
   const counts = new Map<string, number>();
   for (const it of items) {
@@ -282,7 +291,7 @@ function formatOwnerNotification(
   const deliveryAtKst = formatKstWindow(new Date(input.deliveryAt));
   // 모든 사용자 입력 escape (Codex #6)
   const nick = htmlEscape(input.nickname);
-  const phone = htmlEscape(input.phone);
+  const phone = htmlEscape(formatPhoneForOwner(input.phone));
   const building = htmlEscape(input.deliveryAddress.building);
   const floor = input.deliveryAddress.floor ? htmlEscape(input.deliveryAddress.floor) : "";
   const location = input.deliveryAddress.location ? htmlEscape(input.deliveryAddress.location) : "";
