@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
 
-  const slots = await listAvailableSlots({ days: 3 });
+  const slots = await listAvailableSlots({ days: 7 });
   const open = slots.filter((slot) => slot.available);
   if (open.length === 0) {
     return NextResponse.json({ ok: true, fired: 0, reason: "no_open_slots" });

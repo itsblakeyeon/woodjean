@@ -26,6 +26,10 @@ export async function POST(req: Request) {
     return NextResponse.json(result, { status: 201 });
   } catch (e) {
     console.error("[orders POST]", e);
-    return NextResponse.json({ ok: false, error: "internal" }, { status: 500 });
+    return NextResponse.json({
+      ok: false,
+      error: "internal",
+      message: "주문 서버에서 문제가 발생했어요. 매장(010-8484-2120)으로 연락해 주세요.",
+    }, { status: 500 });
   }
 }

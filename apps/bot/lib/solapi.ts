@@ -51,5 +51,5 @@ export const SMS_TEMPLATES = {
   cancelled: (nickname: string, reason?: string) =>
     `[우드진] ${nickname}님 주문이 취소됐어요${reason ? ` (${reason})` : ""}. 매장 010-8484-2120.`,
   slotAvailable: () =>
-    `[우드진] 단체주문 가능 시간이 다시 열렸어요. npx woodjean order 또는 매장(010-8484-2120)으로 문의 부탁드려요.`,
+    `[우드진] 단체주문 가능 시간이 다시 열렸어요. npx woodjean@latest order 또는 매장(010-8484-2120)으로 문의 부탁드려요.`,
 } as const;

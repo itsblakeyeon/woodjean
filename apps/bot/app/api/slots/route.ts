@@ -6,7 +6,10 @@ export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
-  const days = Math.max(1, Math.min(14, Number(url.searchParams.get("days") ?? "7")));
+  const requestedDays = Number(url.searchParams.get("days") ?? "7");
+  const days = Number.isFinite(requestedDays)
+    ? Math.max(7, Math.min(14, requestedDays))
+    : 7;
 
   try {
     const slots = await listAvailableSlots({ days });
