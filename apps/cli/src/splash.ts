@@ -30,7 +30,8 @@ export function splash(options: SplashOptions = {}): void {
   console.log(colorEnabled ? wood.multiline(banner) : banner);
   console.log("");
   console.log(colorEnabled ? gradient(["#d4a574", "#8b6f47"])(`  ${ETHOS}`) : `  ${ETHOS}`);
-  console.log(colorEnabled ? "\x1b[2m  판교 우드진 — 회의용 음료 단체주문 (5~30잔)\x1b[0m" : "  판교 우드진 — 회의용 음료 단체주문 (5~30잔)");
+  const subtitle = "  우드진 판교테크노밸리점 — 음료 단체주문 (5~30잔)";
+  console.log(colorEnabled ? `\x1b[2m${subtitle}\x1b[0m` : subtitle);
   console.log("");
 }
 

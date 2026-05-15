@@ -103,6 +103,7 @@ async function reviewCart(cart: CartItem[]): Promise<number | null> {
 async function pickItems(maxQuantity: number): Promise<CartItem[] | null> {
   type Step = "category" | "menu" | "variant" | "size" | "temp" | "options" | "quantity";
   type AddOnKey = "shot" | "milkChange" | "decaf";
+  type OptionChoice = AddOnKey | "none";
 
   let step: Step = "category";
   let category: MenuCategory | null = null;
@@ -337,27 +338,24 @@ async function pickItems(maxQuantity: number): Promise<CartItem[] | null> {
         continue;
       }
 
-      const action = await p.select<"pick" | "none" | BackValue>({
+      const picks = await p.multiselect<OptionChoice | BackValue>({
         message: "옵션",
         options: [
-          { value: "pick", label: "옵션을 선택할게요" },
-          { value: "none", label: "옵션 없이 넘어갈게요" },
+          { value: "none", label: "옵션 없음" },
+          ...optionList.map((o) => ({ value: o.key, label: o.label })),
           { value: BACK, label: backLabel("options") },
         ],
+        required: false,
       });
-      if (p.isCancel(action)) return null;
-      if (action === BACK) {
+      if (p.isCancel(picks)) return null;
+      if (picks.includes(BACK)) {
         step = previousStep("options") ?? "category";
         continue;
       }
-      if (action === "pick") {
-        const picks = await p.multiselect<AddOnKey>({
-          message: "옵션 — Space로 선택, Enter로 확정해 주세요",
-          options: optionList.map((o) => ({ value: o.key, label: o.label })),
-          required: false,
-        });
-        if (p.isCancel(picks)) return null;
-        for (const k of picks) chosenOpts[k] = true;
+      if (!picks.includes("none")) {
+        for (const k of picks.filter((pick): pick is AddOnKey => pick !== "none" && pick !== BACK)) {
+          chosenOpts[k] = true;
+        }
       }
       step = "quantity";
       continue;
@@ -425,12 +423,11 @@ async function pickQuantity(
 }
 
 export function formatMenuPrice(m: MenuItem): string {
-  const r = m.prices.R;
-  const l = m.prices.L;
-  if (r != null && l != null) return `${r.toLocaleString()}~${l.toLocaleString()}원`;
-  if (r != null) return `${r.toLocaleString()}원`;
-  if (l != null) return `${l.toLocaleString()}원`;
-  return "";
+  const prices = (Object.values(m.prices).filter((price): price is number => price != null));
+  if (prices.length === 0) return "";
+  const min = Math.min(...prices);
+  if (prices.length > 1) return `${min.toLocaleString()}원~`;
+  return `${min.toLocaleString()}원`;
 }
 
 function formatOptions(o: { shot: boolean; milkChange: boolean; decaf: boolean }): string {

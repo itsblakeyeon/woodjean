@@ -9,12 +9,15 @@ type RouterResult =
   | { action: "history" }
   | { action: "cancelled"; reason?: string };
 
-export async function runRouter(state: WoodjeanState | null): Promise<RouterResult> {
+export async function runRouter(
+  state: WoodjeanState | null,
+  opts: { declinedDraft?: boolean } = {},
+): Promise<RouterResult> {
   const lastOrder = state?.lastOrder;
-  if (!lastOrder) return runColdRouter();
+  if (!lastOrder) return runColdRouter(opts);
 
   const tier = getTier(lastOrder.savedAt);
-  if (tier === "expired") return runColdRouter();
+  if (tier === "expired") return runColdRouter(opts);
 
   if (tier === "hot") {
     const total = lastOrder.cart.reduce((sum, item) => sum + item.subtotal, 0);
@@ -61,8 +64,12 @@ export async function runRouter(state: WoodjeanState | null): Promise<RouterResu
   return { action: "manual", draft: { previousLastOrder: lastOrder } };
 }
 
-async function runColdRouter(): Promise<RouterResult> {
-  p.log.info("처음 방문해주셔서 감사해요. 메뉴에서 하나씩 골라드릴게요.");
+async function runColdRouter(opts: { declinedDraft?: boolean } = {}): Promise<RouterResult> {
+  if (opts.declinedDraft) {
+    p.log.info("지난 미제출 주문은 복원하지 않을게요. 새로 주문을 시작할게요.");
+  } else {
+    p.log.info("처음 방문해주셔서 감사해요. 메뉴에서 하나씩 골라드릴게요.");
+  }
   return { action: "manual", draft: {} };
 }
 

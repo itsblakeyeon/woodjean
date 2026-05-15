@@ -92,7 +92,10 @@ export async function confirmAndSubmit({ deliveryAt, cart, delivery, customer }:
       options: it.options,
     })),
     deliveryAt,
-    deliveryAddress: delivery,
+    deliveryAddress: {
+      ...delivery,
+      recipient: delivery.recipient ?? customer.nickname,
+    },
     memo: customer.memo,
     pipaConsented: true,
     termsConsented: true,
@@ -197,9 +200,18 @@ export async function confirmAndSubmitPayload(payload: CreateOrderPayload, resto
         await emitEvent("order_failed", { errorCode: result.error, attemptN: attempt });
         return "server_rejected";
       }
+      if (result.error === "internal") {
+        p.log.error([
+          "주문 서버에서 문제가 발생했어요.",
+          "해결: 매장(010-8484-2120)으로 전화해 주세요.",
+          `주문 정보는 ${DRAFT_PATH}에 저장됐어요.`,
+        ].join("\n"));
+        await emitEvent("order_failed", { errorCode: result.error, attemptN: attempt });
+        return "server_rejected";
+      }
       p.log.error([
         "서버가 주문 접수를 거절했어요.",
-        `원인: [${result.error}] ${result.message}`,
+        `원인: [${result.error}] ${result.message || "알 수 없는 오류"}`,
         "해결: 메시지에 맞춰 다시 시도해 주세요. 급하시면 매장(010-8484-2120)으로 전화 주세요.",
         `주문 정보는 ${DRAFT_PATH}에 저장됐어요.`,
       ].join("\n"));

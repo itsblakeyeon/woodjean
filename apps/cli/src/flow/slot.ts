@@ -1,6 +1,5 @@
 import * as p from "@clack/prompts";
 import { listSlots, registerNotify, type Slot } from "../lib/api";
-import { formatKstWindow } from "../lib/format";
 import { emitEvent } from "../lib/telemetry";
 import { cancel, ok, type StepResult } from "./draft";
 import type { OrderDraft } from "./draft";
@@ -48,10 +47,10 @@ export async function pickSlot(): Promise<Slot | null> {
 
   const daySlots = byDay.get(day) ?? [];
   const choice = await p.select<string>({
-    message: "도착 시간을 선택해 주세요 (lead time 1시간)",
+    message: "도착 시간을 선택해 주세요 (최소 1시간 전 예약)",
     options: daySlots.map((s) => ({
       value: s.deliveryAt,
-      label: formatKstWindow(s.deliveryAt),
+      label: formatTimeWindow(s.deliveryAt),
     })),
   });
   if (p.isCancel(choice)) return null;
@@ -66,7 +65,7 @@ export async function pickSlot(): Promise<Slot | null> {
 }
 
 async function offerNotifyAndExit(): Promise<Slot | null> {
-  p.log.warn("향후 3일 슬롯이 모두 마감됐어요.");
+  p.log.warn("향후 7일 슬롯이 모두 마감됐어요.");
 
   const action = await p.select<"notify" | "store" | "cancel">({
     message: "다음 가능 시간이 열리면 어떻게 할까요?",
@@ -108,4 +107,14 @@ function formatDayLabel(day: string): string {
   const date = d.getDate();
   const dayOfWeek = ["일", "월", "화", "수", "목", "금", "토"][d.getDay()];
   return `${month}/${date} (${dayOfWeek})`;
+}
+
+function formatTimeWindow(iso: string): string {
+  const d = new Date(iso);
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mm = String(d.getMinutes()).padStart(2, "0");
+  const end = new Date(d.getTime() + 60 * 60_000);
+  const eh = String(end.getHours()).padStart(2, "0");
+  const em = String(end.getMinutes()).padStart(2, "0");
+  return `${hh}:${mm}~${eh}:${em}`;
 }

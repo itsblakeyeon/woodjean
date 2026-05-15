@@ -36,16 +36,16 @@ type OrderOptions = {
 
 program
   .name("woodjean")
-  .description("우드진 판교점 단체주문 CLI — 회의용 음료 5~30잔 예약 배달")
+  .description("우드진 판교테크노밸리점 단체주문 CLI — 음료 5~30잔 예약 배달")
   .version(packageJson.version)
   .showHelpAfterError()
   .addHelpText("after", `
 
 Examples:
-  $ npx woodjean order
-  $ npx woodjean order --new
-  $ npx woodjean menu
-  $ npx woodjean history
+  $ npx woodjean@latest order
+  $ npx woodjean@latest order --new
+  $ npx woodjean@latest menu
+  $ npx woodjean@latest history
 
 Environment:
   WOODJEAN_API_URL      주문 API URL override
@@ -131,12 +131,14 @@ program
       });
 
       const persisted = await loadDraft();
+      let declinedDraft = false;
       if (persisted) {
         const restore = await p.confirm({
           message: "지난 미제출 주문이 있어요. 복원할까요?",
           initialValue: true,
         });
         if (p.isCancel(restore)) return cancelOrder("주문이 취소됐어요.");
+        declinedDraft = !restore;
         if (restore) {
           const submitStatus = await confirmAndSubmitPayload(persisted.payload, persisted.savedAt);
           if (submitStatus !== "slot_taken") return finishSubmit(submitStatus);
@@ -156,7 +158,7 @@ program
       }
 
       if (!options.new) {
-        const router = await runRouter(state);
+        const router = await runRouter(state, { declinedDraft });
         if (router.action === "cancelled") return cancelOrder(router.reason ?? "주문이 취소됐어요.");
         if (router.action === "history") {
           return handleHistory(state);

@@ -18,11 +18,11 @@ export async function stepCollectCustomer(draft: OrderDraft): Promise<StepResult
 
 export async function collectCustomer(previousLastOrder?: LastOrder): Promise<Customer | null> {
   const nickname = await p.text({
-    message: "닉네임 (사장님이 메시지/SMS에 사용)",
+    message: "주문자 이름",
     initialValue: previousLastOrder?.nickname,
     validate: (v) => {
-      if (!v || v.trim().length === 0) return "닉네임이 필요해요. 사장님이 SMS·메시지에 사용해요.";
-      if (v.length > 20) return `닉네임은 20자까지 가능해요 (현재 ${v.length}자).`;
+      if (!v || v.trim().length === 0) return "주문자 이름이 필요해요.";
+      if (v.length > 20) return `이름은 20자까지 가능해요 (현재 ${v.length}자).`;
       return undefined;
     },
   });
@@ -47,7 +47,7 @@ export async function collectCustomer(previousLastOrder?: LastOrder): Promise<Cu
 
   const s = p.spinner();
   let spinnerStopped = false;
-  s.start("휴대폰 주문 가능 여부 확인 중");
+  s.start("휴대폰 번호 확인 중");
   try {
     const preflight = await checkPhone(cleanedPhone);
     if (preflight.ok && preflight.blacklisted) {
@@ -58,10 +58,10 @@ export async function collectCustomer(previousLastOrder?: LastOrder): Promise<Cu
       return null;
     }
     if (!preflight.ok && preflight.error !== "rate_limited") {
-      p.log.warn("휴대폰 사전 확인을 완료하지 못했어요. 주문 제출 단계에서 다시 확인할게요.");
+      p.log.warn("휴대폰 번호 확인을 완료하지 못했어요. 주문 제출 단계에서 다시 확인할게요.");
     }
   } catch {
-    p.log.warn("휴대폰 사전 확인을 완료하지 못했어요. 주문 제출 단계에서 다시 확인할게요.");
+    p.log.warn("휴대폰 번호 확인을 완료하지 못했어요. 주문 제출 단계에서 다시 확인할게요.");
   } finally {
     if (!spinnerStopped) s.stop("확인 완료");
   }
