@@ -21,7 +21,7 @@ export async function pickSlot(): Promise<Slot | null> {
     p.log.error(e instanceof Error ? e.message : String(e));
     return null;
   }
-  s.stop(`${slots.length}개 슬롯 가능`);
+  s.stop("주문 가능한 시간 조회 완료");
 
   if (slots.length === 0) {
     return offerNotifyAndExit();
@@ -37,10 +37,9 @@ export async function pickSlot(): Promise<Slot | null> {
 
   const day = await p.select<string>({
     message: "도착 날짜를 선택해 주세요",
-    options: [...byDay.entries()].map(([day, slots]) => ({
+    options: [...byDay.keys()].map((day) => ({
       value: day,
       label: formatDayLabel(day),
-      hint: `${slots.length}개 슬롯`,
     })),
   });
   if (p.isCancel(day)) return null;

@@ -17,7 +17,7 @@ export async function stepCollectDelivery(draft: OrderDraft): Promise<StepResult
 }
 
 export async function collectDelivery(previousLastOrder?: LastOrder): Promise<DeliveryAddress | null> {
-  p.log.info("도보 20분 권장. 범위 밖이면 사장님이 확인 후 카톡드릴 수 있어요.");
+  p.log.info("도보 30분 내 권장. 범위 밖이면 사장님이 확인 후 연락드릴 수 있어요.");
 
   const address = await p.text({
     message: "배달지 (건물·층/호·수령 위치)",
