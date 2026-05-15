@@ -47,3 +47,6 @@ coverage/
 .context/
 .gstack/
 .vercel
+
+# CLI README는 루트 README.md의 빌드 사본 (build.mjs가 동기화)
+apps/cli/README.md

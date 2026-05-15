@@ -34,6 +34,14 @@ await esbuild.build({
 // chmod +x for the bin
 fs.chmodSync(outFile, 0o755);
 
+// 마케팅 README는 monorepo 루트 단일 소스. publish tarball(files: ["dist","README.md"])에
+// 들어가도록 빌드 시 루트 README를 apps/cli로 복사 → npm 페이지 = GitHub 첫 화면 동일.
+// apps/cli/README.md는 git에 안 올림(.gitignore) — 이 복사본이 단일 진실.
+const rootReadme = path.join(cliRoot, "..", "..", "README.md");
+const cliReadme = path.join(cliRoot, "README.md");
+fs.copyFileSync(rootReadme, cliReadme);
+console.log(`✓ Synced README from ${path.relative(process.cwd(), rootReadme)}`);
+
 const stat = fs.statSync(outFile);
 const sizeKb = (stat.size / 1024).toFixed(1);
 console.log(`✓ Built ${path.relative(process.cwd(), outFile)} — ${sizeKb} KB`);
