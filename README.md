@@ -1,6 +1,6 @@
 # Woodjean
 
-판교 우드진(WOODJEAN) 카페 단체주문 CLI 서비스. `npx woodjean order` 한 줄로 5~30잔 예약 배달.
+판교 우드진(WOODJEAN) 카페 단체주문 CLI 서비스. `npx woodjean@latest order` 한 줄로 5~30잔 예약 배달.
 
 ## 모노레포 구조
 

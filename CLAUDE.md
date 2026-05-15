@@ -1,6 +1,6 @@
 # Woodjean — 단체주문 CLI
 
-판교 우드진(WOODJEAN) 카페의 단체주문 배달 서비스. CLI 인터페이스(`npx woodjean order`)를 마케팅 후크로 활용하는 그린필드 프로젝트.
+판교 우드진(WOODJEAN) 카페의 단체주문 배달 서비스. CLI 인터페이스(`npx woodjean@latest order`)를 마케팅 후크로 활용하는 그린필드 프로젝트.
 
 ## 프로젝트 컨텍스트
 

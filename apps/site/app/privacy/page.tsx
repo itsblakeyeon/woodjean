@@ -24,8 +24,8 @@ export default function PrivacyPage() {
         <h2 className="serif mt-10 text-xl text-[var(--color-ink)]">1. 수집 항목 및 수집 방법</h2>
         <p className="mt-3 text-sm leading-loose">매장은 단체주문 서비스 제공을 위해 아래의 개인정보를 수집합니다.</p>
         <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-loose">
-          <li>필수: 닉네임, 휴대전화번호</li>
-          <li>배달 정보: 배달지 건물·층·수령자·수령위치, 추가 메모</li>
+          <li>필수: 주문자 이름, 휴대전화번호</li>
+          <li>배달 정보: 배달지, 추가 메모</li>
           <li>자동 수집: 접속 일시, 접속 IP, 서비스 이용 기록</li>
           <li>v1.5(예정): 토스페이먼츠 선결제 옵션 도입 시 결제 정보 추가 수집</li>
         </ul>
@@ -41,9 +41,9 @@ export default function PrivacyPage() {
 
         <h2 className="serif mt-10 text-xl text-[var(--color-ink)]">3. 보유 및 이용 기간</h2>
         <ul className="mt-3 list-disc space-y-1 pl-5 text-sm leading-loose">
-          <li>회원 정보: 서비스 이용 종료 또는 회원 탈퇴 시까지</li>
-          <li>주문·결제 기록: 「전자상거래 등에서의 소비자보호에 관한 법률」에 따라 5년</li>
-          <li>소비자의 불만 또는 분쟁 처리 기록: 3년</li>
+          <li>주문자 정보 및 배달 정보: 주문일로부터 1년</li>
+          <li>주문·결제 기록: 주문일로부터 1년</li>
+          <li>소비자의 불만 또는 분쟁 처리 기록: 주문일로부터 1년</li>
           <li>접속 로그: 「통신비밀보호법」에 따라 3개월</li>
         </ul>
 

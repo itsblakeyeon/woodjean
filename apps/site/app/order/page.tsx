@@ -30,7 +30,7 @@ export default function OrderPage() {
             한 줄로 주문을 시작합니다
           </h2>
           <pre className="mono mt-6 overflow-x-auto rounded-md bg-[var(--color-ink)] px-5 py-4 text-sm leading-relaxed text-[var(--color-bg)]">
-            <code>$ npx woodjean order</code>
+            <code>$ npx woodjean@latest order</code>
           </pre>
           <p className="mt-4 text-base leading-relaxed text-[var(--color-ink-soft)]">
             메뉴 선택 → 사이즈/온도/옵션 → 잔수 → 배달지 → 닉네임 + 휴대폰 →
@@ -59,7 +59,7 @@ export default function OrderPage() {
         <h2 className="serif text-2xl md:text-3xl">이용 방법</h2>
         <ol className="mt-8 grid gap-4 md:grid-cols-4">
           {[
-            { step: "01", title: "CLI 실행", desc: "터미널에서 npx woodjean order — 한 줄로 시작합니다." },
+            { step: "01", title: "CLI 실행", desc: "터미널에서 npx woodjean@latest order — 한 줄로 시작합니다." },
             { step: "02", title: "메뉴 + 시간", desc: "27종 음료 자유 조합, 1시간 단위 도착 슬롯." },
             { step: "03", title: "사장님 알림", desc: "텔레그램으로 사장님에게 즉시 전달, 자동 수락." },
             { step: "04", title: "현장 후불", desc: "예약 시간에 도착, 사장님께 카드/송금/이체로 결제." },

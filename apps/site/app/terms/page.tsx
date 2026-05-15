@@ -29,7 +29,7 @@ export default function TermsPage() {
           <li>&ldquo;단체주문&rdquo;이란 한 번의 주문에 음료 5잔 이상 30잔 이하를 사전 예약하여 배달 받는 서비스를 말합니다.</li>
           <li>&ldquo;이용자&rdquo;란 본 약관에 동의하고 서비스를 이용하는 개인 또는 법인을 말합니다.</li>
           <li>&ldquo;슬롯&rdquo;이란 1시간 단위로 운영되는 배달 시간대를 말합니다.</li>
-          <li>&ldquo;CLI&rdquo;란 매장이 제공하는 명령줄 주문 인터페이스(<code>npx woodjean order</code>)를 말합니다.</li>
+          <li>&ldquo;CLI&rdquo;란 매장이 제공하는 명령줄 주문 인터페이스(<code>npx woodjean@latest order</code>)를 말합니다.</li>
         </ol>
 
         <h2 className="serif mt-10 text-xl text-[var(--color-ink)]">제3조 (서비스의 내용)</h2>
